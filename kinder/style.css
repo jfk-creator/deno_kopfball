@@ -1,0 +1,38 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: top;
+    align-items: center;
+
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color: var(--night);
+    color: var(--white);
+
+    font-family: Urbanist;
+}
+
+h1 {
+    font-size: 3rem;
+    color: var(--red)
+}
+
+.boxes {
+    display: flex;
+    justify-content: left;
+    width: 80vw;
+}
+
+
+
+:root {
+    --night: #1A1B26;
+    --white: rgb(229, 240, 244);
+    --red: #FF757F;
+    --green: #9ECE6A;
+    --gold: #EFB662;
+    --lightBlue: #7DCFFF;
+    --blue: #7AA2F7;
+}
