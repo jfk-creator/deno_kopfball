@@ -1,0 +1,49 @@
+# Deno specific
+.deno/
+.lock.json
+
+# Node.js (if applicable)
+node_modules/
+package-lock.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+temp/
+tmp/
+
+# Editor/IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Compiled files
+dist/
+build/
+out/
+
+# Environment files
+.env
+*.env.local
+*.env.development
+*.env.production
+
+# Coverage reports
+coverage/
+
+# Dependency cache
+deno_dir/
+
+# Executables
+*.exe
+*.dll
+
+# Secrets (if any)
+secrets/
