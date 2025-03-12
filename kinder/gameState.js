@@ -1,5 +1,5 @@
 let gameState = {
-  frameRate: 60,
+  frameRate: 90,
   width: 960,
   height: 540,
   playerWidth: 50,
