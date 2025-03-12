@@ -83,13 +83,13 @@ function moveBall() {
   ball.y += ball_vel.y;
 
   gameState.p1.x += p1_vel.x;
-  p1_vel.x = p1_vel.x/friction;
+  p1_vel.x = p1_vel.x / 1.125;
   console.log("p1:", p1.x)
 
   if (gameState.p1.x > width) gameState.p1.x = width - 50;
   if (gameState.p1.x < 0) gameState.p1.x = 100;
 
-  ball_vel.x /= friction;
+  ball_vel.x /= 1.003;
   ball_vel.y += gravity;
 
   if (ball.y > height - 5) ball_vel.y *= -1;
@@ -105,7 +105,7 @@ let intervalId: number; // Speichert die ID des Intervalls
 function startInterval() {
   intervalId = setInterval(() => {
     broadcast(JSON.stringify(moveBall()))
-  }, 1000 / 120
+  }, 1000 / 60
 ); 
 
   setTimeout(() => {
