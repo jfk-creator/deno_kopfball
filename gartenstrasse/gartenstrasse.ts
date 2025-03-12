@@ -1,3 +1,5 @@
+import {gameState, runPhysics} from "../kinder/gameState.js"
+
 const sockets = new Set<WebSocket>();
 
 Deno.serve({ port: 420 }, (request) => {
@@ -24,7 +26,6 @@ function handleSocket(socket: WebSocket) {
 
   socket.onmessage = (event) => {
     console.log("Receiveed message: ", event.data);
-    p1_vel.x = parseFloat(event.data);
   };
 
   socket.onclose = () => {
@@ -46,72 +47,19 @@ function broadcast(message: any) {
   }
 }
 
-const width = 960;
-const height = 540
-const centerX = width/2
-const centerY = height/2
-let time = Date.now()
-let ball = {
-  x: centerX,
-  y: centerY
-}
-let p1_vel = {
-  x: 0,
-  y: 0
-}
-let p1 = {
-  x: centerX,
-  y: centerY,
-};
-let ball_vel = {
-  x: 0,
-  y: 0,
-}
-
-let gameState = {
-  p1: p1,
-  ball: ball,
-  time: time
-}
-
-
-
-function moveBall() {
-  const friction = 1.125;
-  const gravity = 0.01;
-  ball.x += ball_vel.x;
-  ball.y += ball_vel.y;
-
-  gameState.p1.x += p1_vel.x;
-  p1_vel.x = p1_vel.x / 1.125;
-  console.log("p1:", p1.x)
-
-  if (gameState.p1.x > width) gameState.p1.x = width - 50;
-  if (gameState.p1.x < 0) gameState.p1.x = 100;
-
-  ball_vel.x /= 1.003;
-  ball_vel.y += gravity;
-
-  if (ball.y > height - 5) ball_vel.y *= -1;
-  if (ball.x > width - 5) ball_vel.x *= -1;
-  if (ball.x < 0 + 5) ball_vel.x *= -1;
-  gameState.ball = ball;
-  gameState.time = Date.now()
-  return gameState;
-}
 
 let intervalId: number; // Speichert die ID des Intervalls
 
-function startInterval() {
+function startGame() {
   intervalId = setInterval(() => {
-    broadcast(JSON.stringify(moveBall()))
+    broadcast(JSON.stringify(runPhysics()))
   }, 1000 / 60
 ); 
 
   setTimeout(() => {
     clearInterval(intervalId);
-    console.log("gameOver");
-  }, 1000000); // 10000 Millisekunden = 10 Sekunden
+    console.log("Gameloop is over.");
+  }, 90); // 10000 Millisekunden = 10 Sekunden
 }
 
-startInterval(); // Starte den Intervall
+startGame(); // Starte den Intervall
