@@ -11,6 +11,7 @@ function draw() {
 
 
   runPhysics()
+  keyInput()
 }
 
 function drawPlayer({ posX, posY}, color){
@@ -18,3 +19,15 @@ function drawPlayer({ posX, posY}, color){
   rect(posX, posY-100, 50, 100);
 }
 
+function keyInput() {
+    // a <-
+  if (keyIsDown(65)) {
+    gameState.player1.velX = -5
+    socket.send(JSON.stringify(gameState))
+  }
+  // d ->
+  if (keyIsDown(68)) {
+    gameState.player1.velX = 5;
+    socket.send(JSON.stringify(gameState));
+  }
+}

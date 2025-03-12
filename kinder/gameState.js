@@ -1,5 +1,5 @@
 
-export const gameState = {
+export let gameState = {
   frameRate: 60,
   width: 960,
   height: 540,
@@ -9,14 +9,20 @@ export const gameState = {
   player1: {
     posX: 20,
     posY: 540,
-    velX: 1,
-    velY: 10,
+    velX: 5,
+    velY: 0,
+  },
+  p1_custom: {
+    color: "#FF757F",
   },
   player2: {
-    posX: 0,
+    posX: 960 - 70,
     posY: 540,
-    velX: 0,
+    velX: -2,
     velY: 0,
+  },
+  p2_custom: {
+    color: "#7DCFFF",
   },
   ball: {
     posX: 0,
@@ -27,44 +33,47 @@ export const gameState = {
 };
 
 export function runPhysics() {
-    //player1
-    gameState.player1 = move(
-      gameState.player1.posX,
-      gameState.player1.posY,
-      gameState.player1.velX,
-      gameState.player1.velY
-    );
-    //player2
-    gameState.player2 = move(
-      gameState.player2.posX,
-      gameState.player2.posY,
-      gameState.player2.velX,
-      gameState.player2.velY
-    );
-    //ball
-    gameState.ball = move(
-      gameState.ball.posX,
-      gameState.ball.posY,
-      gameState.ball.velX,
-      gameState.ball.velY
-    );
+  //player1
+  gameState.player1 = move(gameState.player1);
+  //player2
+  gameState.player2 = move(gameState.player2);
+  //ball
+  gameState.ball = move(gameState.ball);
+  //CheckBounds for all objects:
+  checkBounds();
 }
 
-function move({posX, posY, velX, velY}) {
-    posX += velX;
-    posY += velY;
-    return {posX, posY, velX, velY}
+function move({ posX, posY, velX, velY }) {
+  posX += velX;
+  posY += velY;
+  return { posX, posY, velX, velY };
 }
+
+// function checkBounds() {
+//   //player1
+//   if (gameState.player1.posX < 0) gameState.player1.posX = 0;
+//   if (gameState.player1.posX > gameState.width - gameState.playerWidth) gameState.player1.posX = gameState.width - gameState.playerWidth;
+//   //player2
+//   if (gameState.player2.posX < 0) gameState.player2.posX = 0;
+//   if (gameState.player2.posX > gameState.width - gameState.playerWidth) gameState.player2.posX = gameState.width - gameState.playerWidth;
+//   //ball
+//   if (gameState.ball.posX < gameState.ballDia / 2) gameState.ball.velX *= -1;
+//   if (gameState.ball.posX > gameState.width - (gameState.ballDia / 2)) gameState.ball.velX *= -1;
+//   if (gameState.ball.posY > gameState.height) gameState.ball.velY *= -1;
+// }
 
 function checkBounds() {
   //player1
-  if (gameState.player1.posX < playerWidth) gameState.player1.posX = playerWidth;
-  if (gameState.player1.posX > width - playerWidth) gameState.player1.posX = width - playerWidth;
+  if (gameState.player1.posX < 0) gameState.player1.velX *= -1;
+  if (gameState.player1.posX > gameState.width - gameState.playerWidth)
+    gameState.player1.velX *= -1;
   //player2
-  if (gameState.player2.posX < playerWidth) gameState.player2.posX = 0;
-  if (gameState.player2.posX > width - playerWidth) gameState.player2.posX = width - playerWidth;
+  if (gameState.player2.posX < 0) gameState.player2.velX *= -1;
+  if (gameState.player2.posX > gameState.width - gameState.playerWidth)
+    gameState.player2.velX *= -1;
   //ball
-  if (gameState.ball.posX < ballDia / 2) gameState.ball.velX *= -1;
-  if (gameState.ball.posX > width - (ballDia / 2)) gameState.ball.velX *= -1;
-  if (gameState.ball.posY > height) gameState.ball.velY *= -1;
+  if (gameState.ball.posX < gameState.ballDia / 2) gameState.ball.velX *= -1;
+  if (gameState.ball.posX > gameState.width - gameState.ballDia / 2)
+    gameState.ball.velX *= -1;
+  if (gameState.ball.posY > gameState.height) gameState.ball.velY *= -1;
 }

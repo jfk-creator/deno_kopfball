@@ -1,4 +1,4 @@
-const gameState = {
+let gameState = {
   frameRate: 60,
   width: 960,
   height: 540,
@@ -46,18 +46,35 @@ function runPhysics() {
 function move({posX, posY, velX, velY}) {
     posX += velX;
     posY += velY;
+    
     return {posX, posY, velX, velY}
 }
 
+// function checkBounds() {
+//   //player1
+//   if (gameState.player1.posX < 0) gameState.player1.posX = 0;
+//   if (gameState.player1.posX > gameState.width - gameState.playerWidth) gameState.player1.posX = gameState.width - gameState.playerWidth;
+//   //player2
+//   if (gameState.player2.posX < 0) gameState.player2.posX = 0;
+//   if (gameState.player2.posX > gameState.width - gameState.playerWidth) gameState.player2.posX = gameState.width - gameState.playerWidth;
+//   //ball
+//   if (gameState.ball.posX < gameState.ballDia / 2) gameState.ball.velX *= -1;
+//   if (gameState.ball.posX > gameState.width - (gameState.ballDia / 2)) gameState.ball.velX *= -1;
+//   if (gameState.ball.posY > gameState.height) gameState.ball.velY *= -1;
+// }
+
 function checkBounds() {
   //player1
-  if (gameState.player1.posX < 0) gameState.player1.posX = 0;
-  if (gameState.player1.posX > gameState.width - gameState.playerWidth) gameState.player1.posX = gameState.width - gameState.playerWidth;
+  if (gameState.player1.posX < 0) gameState.player1.velX *= -1;
+  if (gameState.player1.posX > gameState.width - gameState.playerWidth)
+    gameState.player1.velX *= -1;
   //player2
-  if (gameState.player2.posX < 0) gameState.player2.posX = 0;
-  if (gameState.player2.posX > gameState.width - gameState.playerWidth) gameState.player2.posX = gameState.width - gameState.playerWidth;
+  if (gameState.player2.posX < 0) gameState.player2.velX *= -1;
+  if (gameState.player2.posX > gameState.width - gameState.playerWidth)
+    gameState.player2.velX *= -1
   //ball
   if (gameState.ball.posX < gameState.ballDia / 2) gameState.ball.velX *= -1;
-  if (gameState.ball.posX > gameState.width - (gameState.ballDia / 2)) gameState.ball.velX *= -1;
+  if (gameState.ball.posX > gameState.width - gameState.ballDia / 2)
+    gameState.ball.velX *= -1;
   if (gameState.ball.posY > gameState.height) gameState.ball.velY *= -1;
 }
