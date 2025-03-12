@@ -16,7 +16,6 @@ function handleConnection(socket) {
     let data = JSON.parse(event.data);
     ball.x = data.x 
     ball.y = data.y
-    console.log("message: ", data) 
   });
   socket.addEventListener("close", () => {
     console.log("disconnected from server");
@@ -27,5 +26,4 @@ function handleConnection(socket) {
 function sendData(){
     let data = { text: "Hello from federball"};
     socket.send(JSON.stringify(data));
-    console.log("send msg: ", data);
 }

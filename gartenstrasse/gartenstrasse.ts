@@ -79,7 +79,8 @@ let intervalId: number; // Speichert die ID des Intervalls
 function startInterval() {
   intervalId = setInterval(() => {
     broadcast(JSON.stringify(moveBall()))
-  }, 1000 / 120); 
+  }, 1000 / 30
+); 
 
   setTimeout(() => {
     clearInterval(intervalId);
