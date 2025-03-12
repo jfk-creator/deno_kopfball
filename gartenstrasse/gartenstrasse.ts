@@ -50,6 +50,7 @@ const width = 960;
 const height = 540
 const centerX = width/2
 const centerY = height/2
+let time = Date.now()
 let ball = {
   x: centerX,
   y: centerY
@@ -61,11 +62,14 @@ let ball_vel = {
 
 let gameState = {
   ball: ball,
+  time: time
 }
+
+
 
 function moveBall() {
   const friction = 1.003;
-  const gravity = 0.1;
+  const gravity = 0.01;
   ball.x += ball_vel.x;
   ball.y += ball_vel.y;
 
@@ -76,6 +80,7 @@ function moveBall() {
   if (ball.x > width - 5) ball_vel.x *= -1;
   if (ball.x < 0 + 5) ball_vel.x *= -1;
   gameState.ball = ball;
+  gameState.time = Date.now()
   return gameState;
 }
 
