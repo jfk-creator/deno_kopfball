@@ -1,8 +1,14 @@
 const sockets = new Set<WebSocket>();
 
-Deno.serve((request) => {
+Deno.serve({ port: 420 }, (request) => {
   if (request.headers.get("upgrade") !== "websocket") {
     return new Response(null, { status: 501 });
+  }
+  if (sockets.size >= 2) {
+    console.error(
+      "Incomming connection denied. It's only a 2 player game. "
+    );
+    return new Response("Server full.", { status: 429});
   }
   const { socket, response } = Deno.upgradeWebSocket(request);
   handleSocket(socket);
@@ -10,13 +16,8 @@ Deno.serve((request) => {
 });
 
 function handleSocket(socket: WebSocket) {
-  if(sockets.size < 2){
-    sockets.add(socket);
-  } else {
-    console.error("Incomming connection denied. It's only a 2 player game. ");
-    return;
-  }
-
+  sockets.add(socket);
+  
   socket.onopen = () => {
     console.log("WebSocket connection opened");
   };
@@ -77,15 +78,13 @@ let intervalId: number; // Speichert die ID des Intervalls
 
 function startInterval() {
   intervalId = setInterval(() => {
-    console.log("Intervall wird ausgeführt");
     broadcast(JSON.stringify(moveBall()))
-  }, 1000 / 60); // Beispiel: ungefähr 60 Mal pro Sekunde
+  }, 1000 / 120); 
 
-  // Stoppe den Intervall nach 10 Sekunden
   setTimeout(() => {
     clearInterval(intervalId);
-    console.log("Intervall gestoppt");
-  }, 10000); // 10000 Millisekunden = 10 Sekunden
+    console.log("gameOver");
+  }, 1000000); // 10000 Millisekunden = 10 Sekunden
 }
 
 startInterval(); // Starte den Intervall

@@ -2,10 +2,10 @@ let socket;
 let info = document.getElementById("info");
 
 function connectWebSocket() {
-  socket = new WebSocket("ws://192.168.178.22:8000");
+  socket = new WebSocket("ws://77.179.182.49:420");
   socket.addEventListener("open", () => {
     console.log("connected to server"); 
-    info.innerHTML += `connected to server </br>`  
+    info.innerHTML += `</br>connected to server </br>`;  
   });
   handleConnection(socket);
 }
@@ -20,6 +20,7 @@ function handleConnection(socket) {
   });
   socket.addEventListener("close", () => {
     console.log("disconnected from server");
+    info.innerHTML += `disconnected to server </br>`; 
   });
 }
 

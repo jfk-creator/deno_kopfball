@@ -34,6 +34,7 @@ function setup() {
   ball = createVector(width / 2, height / 2);
   ball_vel = createVector(0, -2);
   ball_height = height - 135;
+  frameRate(60)
 }
 
 function draw() {
