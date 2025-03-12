@@ -45,7 +45,7 @@ function draw() {
   if (racketTick_p2 < 15) racketTick_p2++;
   keyInput();
   movePlayers();
-//   moveBall();
+  moveBall();
   bodysCollide();
   background(15);
   drawPlayer(p1, 1);
@@ -91,19 +91,19 @@ function drawBall() {
   circle(ball.x, ball.y, 10 * counter);
 }
 
-// function moveBall() {
-//   if (ball.y > height) gameOver = true;
-//   const friction = 1.003;
-//   const gravity = 0.01;
-//   ball.x += ball_vel.x;
-//   ball.y += ball_vel.y;
+function moveBall() {
+  if (ball.y > height) gameOver = true;
+  const friction = 1.003;
+  const gravity = 0.01;
+  ball.x += ball_vel.x;
+  ball.y += ball_vel.y;
 
-//   ball_vel.x /= friction;
-//   ball_vel.y += gravity;
+  ball_vel.x /= friction;
+  ball_vel.y += gravity;
 
-//   if (ball.x > width - 5) ball_vel.x *= -1;
-//   if (ball.x < 0 + 5) ball_vel.x *= -1;
-// }
+  if (ball.x > width - 5) ball_vel.x *= -1;
+  if (ball.x < 0 + 5) ball_vel.x *= -1;
+}
 
 let frames = 0;
 function hitBall() {

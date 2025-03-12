@@ -59,9 +59,13 @@ let ball_vel = {
   y: 0,
 }
 
+let gameState = {
+  ball: ball,
+}
+
 function moveBall() {
   const friction = 1.003;
-  const gravity = 0.01;
+  const gravity = 0.1;
   ball.x += ball_vel.x;
   ball.y += ball_vel.y;
 
@@ -71,7 +75,8 @@ function moveBall() {
   if (ball.y > height - 5) ball_vel.y *= -1;
   if (ball.x > width - 5) ball_vel.x *= -1;
   if (ball.x < 0 + 5) ball_vel.x *= -1;
-  return ball;
+  gameState.ball = ball;
+  return gameState;
 }
 
 let intervalId: number; // Speichert die ID des Intervalls
@@ -79,7 +84,7 @@ let intervalId: number; // Speichert die ID des Intervalls
 function startInterval() {
   intervalId = setInterval(() => {
     broadcast(JSON.stringify(moveBall()))
-  }, 1000 / 30
+  }, 1000 / 120
 ); 
 
   setTimeout(() => {

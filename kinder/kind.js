@@ -14,8 +14,9 @@ function connectWebSocket() {
 function handleConnection(socket) {
   socket.addEventListener("message", (event) => {
     let data = JSON.parse(event.data);
-    ball.x = data.x 
-    ball.y = data.y
+    let serverBall = data.ball
+    ball.x = serverBall.x 
+    ball.y = serverBall.y
   });
   socket.addEventListener("close", () => {
     console.log("disconnected from server");
