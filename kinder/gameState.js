@@ -1,5 +1,4 @@
-
-export let gameState = {
+let gameState = {
   frameRate: 60,
   width: 960,
   height: 540,
@@ -25,28 +24,65 @@ export let gameState = {
     color: "#7DCFFF",
   },
   ball: {
-    posX: 0,
-    posY: 0,
-    velX: 0,
-    velY: 0,
+    posX: 70,
+    posY: 540/2,
+    velX: 2,
+    velY: -2,
   },
 };
 
-export function runPhysics() {
-  //player1
-  gameState.player1 = move(gameState.player1);
-  //player2
-  gameState.player2 = move(gameState.player2);
-  //ball
-  gameState.ball = move(gameState.ball);
-  //CheckBounds for all objects:
-  checkBounds();
+console.log("Gamestate size (kb): " ,JSON.stringify(gameState).length*2)
+function runPhysics() {
+    //player1
+    gameState.player1 = move(gameState.player1);
+    gameState.player1 = resistance(gameState.player1);
+    //player2
+    gameState.player2 = move(gameState.player2);
+    gameState.player2 = resistance(gameState.player2);
+    //ball
+    gameState.ball = move(gameState.ball);
+    gameState.ball = gravity(gameState.ball);
+    //CheckBounds for all objects: 
+    checkBounds();
+    kopfball(gameState.player1, gameState.ball);
+    kopfball(gameState.player2, gameState.ball);
 }
 
-function move({ posX, posY, velX, velY }) {
-  posX += velX;
-  posY += velY;
+function move({posX, posY, velX, velY}) {
+    posX += velX;
+    posY += velY;
+    
+    return {posX, posY, velX, velY}
+}
+
+function gravity({ posX, posY, velX, velY }) {
+  velY += 0.3
+  velY *= 0.995
+  const factor = Math.pow(10, 10);
+  velY = Math.floor(velY * factor) / factor;
+
   return { posX, posY, velX, velY };
+}
+
+function resistance(player) {
+  player.velX *= 0.8
+  const factor = Math.pow(10, 10);
+  player.velY = Math.floor(player.velY * factor) / factor;
+  return player
+}
+
+function kopfball(player, ball) {
+  if (
+    ball.posX - player.posX < gameState.playerWidth + 3 &&
+    ball.posX - player.posX > -3 &&
+    ball.velY > 0 &&
+    ball.posY < gameState.height - 85 &&
+    ball.posY > gameState.height - 100
+  ) {
+    gameState.ball.velY += 5;
+    gameState.ball.velY *= -1;
+    gameState.ball.velX += (ball.posX - player.posX - 25)/25;
+  };
 }
 
 // function checkBounds() {
@@ -70,7 +106,7 @@ function checkBounds() {
   //player2
   if (gameState.player2.posX < 0) gameState.player2.velX *= -1;
   if (gameState.player2.posX > gameState.width - gameState.playerWidth)
-    gameState.player2.velX *= -1;
+    gameState.player2.velX *= -1
   //ball
   if (gameState.ball.posX < gameState.ballDia / 2) gameState.ball.velX *= -1;
   if (gameState.ball.posX > gameState.width - gameState.ballDia / 2)

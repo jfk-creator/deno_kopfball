@@ -1,4 +1,6 @@
 const sockets = new Set<WebSocket>();
+let socketCounter = 1;
+let gamestarted = false
 
 Deno.serve({ port: 420 }, (request) => {
   if (request.headers.get("upgrade") !== "websocket") {
@@ -19,12 +21,20 @@ function handleSocket(socket: WebSocket) {
   sockets.add(socket);
   
   socket.onopen = () => {
-    console.log("WebSocket connection opened");
+    console.log(`we found player${socketCounter}`);
+    const paket = {
+      id: socketCounter++,
+      gs: gameState
+    }
+    socket.send(JSON.stringify(paket))
   };
 
   socket.onmessage = (event) => {
-    console.log("Received message: ", JSON.parse(event.data));
-    gameState = JSON.parse(event.data);
+    const paket = JSON.parse(event.data);
+    console.log("Received message: ", paket)
+    if(paket.id == 1) gameState.player1.velX = paket.velX
+    if(paket.id == 2) gameState.player2.velX = paket.velX
+
   };
 
   socket.onclose = () => {
@@ -41,34 +51,18 @@ function handleSocket(socket: WebSocket) {
 function broadcast() {
   for (const socket of sockets) {
     if (socket.readyState === WebSocket.OPEN) {
-      socket.send(JSON.stringify(gameState));
+      const paket = {
+        id: socketCounter,
+        gs: gameState,
+      };
+      socket.send(JSON.stringify(paket));
     }
   }
 }
-
-let intervalId: number; // Speichert die ID des Intervalls
-
-function startGame() {
-  intervalId = setInterval(() => {
-    broadcast()
-    runPhysics()
-  }, 1000 / 60
-); 
-
-  setTimeout(() => {
-    clearInterval(intervalId);
-    console.log("Gameloop is over.");
-  }, 1000000); // 10000 Millisekunden = 10 Sekunden
-}
-
-startGame(); // Starte den Intervall
-
-
-
 // gamestate
 
 let gameState = {
-  frameRate: 60,
+  frameRate: 90,
   width: 960,
   height: 540,
   playerWidth: 50,
@@ -93,22 +87,27 @@ let gameState = {
     color: "#7DCFFF",
   },
   ball: {
-    posX: 0,
-    posY: 0,
-    velX: 0,
-    velY: 0,
+    posX: 70,
+    posY: 540 / 2,
+    velX: 2,
+    velY: -2,
   },
 };
 
-function runPhysics() {
+async function runPhysics() {
   //player1
-  gameState.player1 = move(gameState.player1);
-  //player2
-  gameState.player2 = move(gameState.player2);
-  //ball
-  gameState.ball = move(gameState.ball);
-  //CheckBounds for all objects:
-  checkBounds();
+    gameState.player1 = move(gameState.player1);
+    gameState.player1 = resistance(gameState.player1);
+    //player2
+    gameState.player2 = move(gameState.player2);
+    gameState.player2 = resistance(gameState.player2);
+    //ball
+    gameState.ball = move(gameState.ball);
+    gameState.ball = gravity(gameState.ball);
+    //CheckBounds for all objects: 
+    checkBounds();
+    kopfball(gameState.player1, gameState.ball);
+    kopfball(gameState.player2, gameState.ball);
 }
 
 interface vec4 {
@@ -122,6 +121,36 @@ function move({ posX, posY, velX, velY }: vec4) {
   posX += velX;
   posY += velY;
   return { posX, posY, velX, velY };
+}
+
+function gravity({ posX, posY, velX, velY }: vec4) {
+  velY += 0.3;
+  velY *= 0.99;
+  const factor = Math.pow(10, 10);
+  velY = Math.floor(velY * factor) / factor;
+
+  return { posX, posY, velX, velY };
+}
+
+function resistance(player: vec4) {
+  player.velX *= 0.8;
+  const factor = Math.pow(10, 10);
+  player.velY = Math.floor(player.velY * factor) / factor;
+  return player;
+}
+
+function kopfball(player: vec4, ball: vec4) {
+  if (
+    ball.posX - player.posX < gameState.playerWidth + 3 &&
+    ball.posX - player.posX > -3 &&
+    ball.velY > 0 &&
+    ball.posY < gameState.height - 85 &&
+    ball.posY > gameState.height - 100
+  ) {
+    gameState.ball.velY += 5;
+    gameState.ball.velY *= -1;
+    gameState.ball.velX += (ball.posX - player.posX - 25) / 25;
+  }
 }
 
 // function checkBounds() {
@@ -152,3 +181,24 @@ function checkBounds() {
     gameState.ball.velX *= -1;
   if (gameState.ball.posY > gameState.height) gameState.ball.velY *= -1;
 }
+
+// gameLoop
+
+let intervalId: number;
+
+function startGame() {
+  intervalId = setInterval(() => {
+    runPhysics()
+    broadcast()
+  }, 1000 / gameState.frameRate 
+); 
+
+  setTimeout(() => {
+    clearInterval(intervalId);
+    console.log("Gameloop is over.");
+  }, 1000000); 
+}
+
+startGame()
+
+
