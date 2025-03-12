@@ -62,7 +62,7 @@ function broadcast() {
 // gamestate
 
 let gameState = {
-  frameRate: 90,
+  frameRate: 60,
   width: 960,
   height: 540,
   playerWidth: 50,
