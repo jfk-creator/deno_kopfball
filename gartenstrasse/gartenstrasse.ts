@@ -24,7 +24,7 @@ function handleSocket(socket: WebSocket) {
 
   socket.onmessage = (event) => {
     console.log("Receiveed message: ", event.data);
-    broadcast(event.data);
+    p1_vel.x = parseFloat(event.data);
   };
 
   socket.onclose = () => {
@@ -55,12 +55,21 @@ let ball = {
   x: centerX,
   y: centerY
 }
+let p1_vel = {
+  x: 0,
+  y: 0
+}
+let p1 = {
+  x: centerX,
+  y: centerY,
+};
 let ball_vel = {
   x: 0,
   y: 0,
 }
 
 let gameState = {
+  p1: p1,
   ball: ball,
   time: time
 }
@@ -68,10 +77,17 @@ let gameState = {
 
 
 function moveBall() {
-  const friction = 1.003;
+  const friction = 1.125;
   const gravity = 0.01;
   ball.x += ball_vel.x;
   ball.y += ball_vel.y;
+
+  gameState.p1.x += p1_vel.x;
+  p1_vel.x = p1_vel.x/friction;
+  console.log("p1:", p1.x)
+
+  if (gameState.p1.x > width) gameState.p1.x = width - 50;
+  if (gameState.p1.x < 0) gameState.p1.x = 100;
 
   ball_vel.x /= friction;
   ball_vel.y += gravity;

@@ -17,7 +17,8 @@ function handleConnection(socket) {
     let serverBall = data.ball
     ball.x = serverBall.x 
     ball.y = serverBall.y
-    console.log((Date.now() - data.time));
+    p1.x = data.p1.x
+    // console.log((Date.now() - data.time));
   });
   socket.addEventListener("close", () => {
     console.log("disconnected from server");

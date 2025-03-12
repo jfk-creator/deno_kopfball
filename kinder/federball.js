@@ -248,10 +248,12 @@ function keyInput() {
   if (keyIsDown(65) && p1.x > offset) {
     // a <-
     vel1.x = -5;
+    socket.send(-5)
   }
   if (keyIsDown(68) && p1.x < width - playerWidth - offset && !bodysCollide()) {
     // d ->
     vel1.x = 5;
+    socket.send(5);
   }
   if (keyIsDown(LEFT_ARROW) && p2.x > offset && !bodysCollide()) {
     vel2.x = -5;
