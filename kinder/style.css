@@ -12,6 +12,7 @@ body {
     color: var(--white);
 
     font-family: Urbanist;
+    overflow: hidden;
 }
 
 h1 {
@@ -24,8 +25,6 @@ h1 {
     justify-content:space-around;
     width: 80vw;
 }
-
-
 
 :root {
     --night: #1A1B26;

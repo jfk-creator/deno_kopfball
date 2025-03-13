@@ -3,7 +3,7 @@ let gameState = {
   width: 960,
   height: 540,
   playerWidth: 50,
-  movementSpeed: 1,
+  movementSpeed: 5,
   resistance: 0.899,
   hitForce: 1.5,
   gravity: 0.25,
@@ -43,7 +43,7 @@ function initGameState() {
     width: 960,
     height: 540,
     playerWidth: 50,
-    movementSpeed: 1,
+    movementSpeed: 5,
     resistance: 0.899,
     hitForce: 1.5,
     gravity: 0.25,
@@ -152,4 +152,40 @@ function checkBounds() {
     gameState.ball.velY *= -0.98;
   }
 }
+
+// gameLoop
+
+let intervalId;
+let clientTick = 0;
+let maxTickDif = 0;
+
+function startGame() {
+  intervalId = setInterval(() => {
+    clientTick++;
+    runPhysics();
+  }, 1000 / gameState.frameRate); 
+
+  setTimeout(() => {
+    clearInterval(intervalId);
+    console.log("Gameloop is over.");
+  }, 1000000); 
+}
+
+startGame()
+
+// let lastTime = performance.now();
+
+// function serverAnimationLoop() {
+//   const currentTime = performance.now();
+//   const deltaTime = currentTime - lastTime;
+//   lastTime = currentTime;
+
+//   clientTick++;
+//   runPhysics()
+//   const targetIntervalMs = 1000 / gameState.frameRate;
+//   const delay = Math.max(0, targetIntervalMs - deltaTime);
+//   setTimeout(serverAnimationLoop, delay);
+// }
+// serverAnimationLoop()
+// setTimeout(serverAnimationLoop, 0);
 

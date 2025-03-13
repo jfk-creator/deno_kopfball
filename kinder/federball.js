@@ -1,3 +1,4 @@
+
 function setup() {
   let canvas = createCanvas(960, 540);
   canvas.parent('theater');
@@ -11,10 +12,9 @@ function draw() {
   drawPlayer(gameState.player2, gameState.p2_custom.color);
   drawBall(gameState.ball, gameState.ballR);
 
-  runPhysics()
-  console.log("runPhysics")
   keyInput()
 }
+
 
 function drawPlayer({ posX, posY}, color){
   fill(color);
@@ -30,24 +30,24 @@ function keyInput() {
   if (id === -1) {
     // a <-
     if (keyIsDown(65)) {
-      gameState.player1.velX -= gameState.movementSpeed;
+      gameState.player1.velX = -gameState.movementSpeed;
     }
     // d ->
     if (keyIsDown(68)) {
-      gameState.player1.velX += gameState.movementSpeed;
+      gameState.player1.velX = gameState.movementSpeed;
     }
     if (keyIsDown(LEFT_ARROW)) {
-      gameState.player2.velX -= gameState.movementSpeed;
+      gameState.player2.velX = -gameState.movementSpeed;
     }
     if (keyIsDown(RIGHT_ARROW)) {
-      gameState.player2.velX += gameState.movementSpeed;
+      gameState.player2.velX = gameState.movementSpeed;
     }
     if (keyIsDown(82)) initGameState()
   }
   if(id === 1){
       // a <-
     if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
-      gameState.player1.velX -= gameState.movementSpeed;
+      gameState.player1.velX = -gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
       const paket = {
         id: id,
@@ -58,7 +58,7 @@ function keyInput() {
     }
     // d ->
     if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
-      gameState.player1.velX += gameState.movementSpeed;
+      gameState.player1.velX = +gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
           id: id,
@@ -71,7 +71,7 @@ function keyInput() {
   if (id === 2) {
     // a <-
     if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
-      gameState.player2.velX -= gameState.movementSpeed;
+      gameState.player2.velX = -gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
           id: id,
@@ -82,7 +82,7 @@ function keyInput() {
     }
     // d ->d
     if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
-      gameState.player2.velX += gameState.movementSpeed;
+      gameState.player2.velX = +gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
           id: id,

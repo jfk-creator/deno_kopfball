@@ -31,7 +31,7 @@ function handleSocket(socket: WebSocket) {
 
   socket.onmessage = (event) => {
     const paket = JSON.parse(event.data);
-    console.log("Received message: ", paket)
+    // console.log("Received message: ", paket)
     if(paket.id == 1) gameState.player1.velX = paket.velX
     if(paket.id == 2) gameState.player2.velX = paket.velX
 
@@ -68,7 +68,7 @@ let gameState = {
   width: 960,
   height: 540,
   playerWidth: 50,
-  movementSpeed: 1,
+  movementSpeed: 5,
   resistance: 0.899,
   hitForce: 1.5,
   gravity: 0.25,
@@ -108,7 +108,7 @@ function initGameState() {
     width: 960,
     height: 540,
     playerWidth: 50,
-    movementSpeed: 1,
+    movementSpeed: 5,
     resistance: 0.899,
     hitForce: 1.5,
     gravity: 0.25,
@@ -231,10 +231,9 @@ let intervalId: number;
 function startGame() {
   intervalId = setInterval(() => {
     gameState.tick++;
-      runPhysics()
+    runPhysics()
     broadcast()
-  }, 1000 / gameState.frameRate
-); 
+  }, 1000 / 90); 
 
   setTimeout(() => {
     clearInterval(intervalId);
@@ -243,5 +242,25 @@ function startGame() {
 }
 
 startGame()
+
+// let lastTime = performance.now();
+
+// function serverAnimationLoop() {
+//   const currentTime = performance.now();
+//   const deltaTime = currentTime - lastTime;
+//   lastTime = currentTime;
+
+//   gameState.tick++;
+//   runPhysics();
+//   broadcast()
+
+//   const targetIntervalMs = 1000 / gameState.frameRate *1.5;
+//   const delay = Math.max(0, targetIntervalMs - deltaTime);
+//   setTimeout(serverAnimationLoop, delay);
+// }
+
+// setTimeout(serverAnimationLoop, 0);
+
+
 
 
