@@ -47,7 +47,7 @@ function initGameState() {
     resistance: 0.899,
     hitForce: 1.5,
     gravity: 0.25,
-    airDrag: 0.998,
+    airDrag: 0.995,
     ballR: 5,
     tick: 0,
     hits: 0,

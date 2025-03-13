@@ -145,18 +145,18 @@ function initGameState() {
 
 async function runPhysics() {
   //player1
-    gameState.player1 = move(gameState.player1);
-    gameState.player1 = resistance(gameState.player1);
-    //player2
-    gameState.player2 = move(gameState.player2);
-    gameState.player2 = resistance(gameState.player2);
-    //ball
-    gameState.ball = move(gameState.ball);
-    gameState.ball = ballPhysics(gameState.ball);
-    //CheckBounds for all objects: 
-    checkBounds();
-    kopfball(gameState.player1, gameState.ball);
-    kopfball(gameState.player2, gameState.ball);
+  gameState.player1 = move(gameState.player1);
+  gameState.player1 = resistance(gameState.player1);
+  //player2
+  gameState.player2 = move(gameState.player2);
+  gameState.player2 = resistance(gameState.player2);
+  //ball
+  gameState.ball = move(gameState.ball);
+  gameState.ball = ballPhysics(gameState.ball);
+  //CheckBounds for all objects:
+  checkBounds();
+  kopfball(gameState.player1, gameState.ball);
+  kopfball(gameState.player2, gameState.ball);
 }
 
 interface vec4 {
@@ -169,6 +169,7 @@ interface vec4 {
 function move({ posX, posY, velX, velY }: vec4) {
   posX += velX;
   posY += velY;
+
   return { posX, posY, velX, velY };
 }
 
@@ -197,10 +198,10 @@ function kopfball(player: vec4, ball: vec4) {
     ball.posY < gameState.height - 85 &&
     ball.posY > gameState.height - 100
   ) {
-    gameState.ball.velY += 5;
+    gameState.hits++;
+    gameState.ball.velY += gameState.hitForce;
     gameState.ball.velY *= -1;
     gameState.ball.velX += (ball.posX - player.posX - 25) / 25;
-    gameState.hits++;
   }
 }
 
@@ -217,7 +218,7 @@ function checkBounds() {
   if (gameState.ball.posX < gameState.ballR) gameState.ball.velX *= -0.98;
   if (gameState.ball.posX > gameState.width - gameState.ballR)
     gameState.ball.velX *= -0.98;
-  if (gameState.ball.posY > gameState.height - gameState.ballR){
+  if (gameState.ball.posY > gameState.height - gameState.ballR) {
     gameState.hits = 0;
     gameState.ball.velY *= -0.98;
   }
