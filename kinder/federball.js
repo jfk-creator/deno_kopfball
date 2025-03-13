@@ -8,10 +8,13 @@ function draw() {
   background(20);  
   drawPlayer(gameState.player1, gameState.p1_custom.color)
   drawPlayer(gameState.player2, gameState.p2_custom.color);
-  drawBall(gameState.ball);
+  drawBall(gameState.ball, gameState.ballR);
 
-
-  runPhysics()
+  if(predict) {
+    runPhysics()
+    console.log("predicted")
+  }
+  predict = true
   keyInput()
 }
 
@@ -20,28 +23,33 @@ function drawPlayer({ posX, posY}, color){
   rect(posX, posY-100, 50, 100);
 }
 
-function drawBall({ posX, posY}){
+function drawBall(ball, radius){
   fill(180)
-  circle(posX, posY, 10)
+  circle(ball.posX, ball.posY, radius*2)
 }
 
 function keyInput() {
   if (id === -1) {
     // a <-
     if (keyIsDown(65)) {
-      gameState.player1.velX = -5;
-      
+      gameState.player1.velX -= gameState.movementSpeed;
     }
     // d ->
     if (keyIsDown(68)) {
-      gameState.player1.velX = 5;
-      
+      gameState.player1.velX += gameState.movementSpeed;
     }
+    if (keyIsDown(LEFT_ARROW)) {
+      gameState.player2.velX -= gameState.movementSpeed;
+    }
+    if (keyIsDown(RIGHT_ARROW)) {
+      gameState.player2.velX += gameState.movementSpeed;
+    }
+    if (keyIsDown(82)) initGameState()
   }
   if(id === 1){
       // a <-
-    if (keyIsDown(65) ) {
-      gameState.player1.velX = -5
+    if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
+      gameState.player1.velX -= gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
       const paket = {
         id: id,
@@ -51,39 +59,39 @@ function keyInput() {
     }
     }
     // d ->
-    if (keyIsDown(68) ) {
-      gameState.player1.velX = 5;
+    if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
+      gameState.player1.velX += gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
-      const paket = {
-        id: id,
-        velX: gameState.player1.velX,
-      };
-      socket.send(JSON.stringify(paket));
-    };
+        const paket = {
+          id: id,
+          velX: gameState.player1.velX,
+        };
+        socket.send(JSON.stringify(paket));
+      }
     }
   }
   if (id === 2) {
     // a <-
-    if (keyIsDown(65) ) {
-      gameState.player2.velX = -5;
+    if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
+      gameState.player2.velX -= gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
-      const paket = {
-        id: id,
-        velX: gameState.player2.velX,
-      };
-      socket.send(JSON.stringify(paket));
-    };
+        const paket = {
+          id: id,
+          velX: gameState.player2.velX,
+        };
+        socket.send(JSON.stringify(paket));
+      }
     }
     // d ->d
-    if (keyIsDown(68)) {
-      gameState.player2.velX = 5;
+    if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
+      gameState.player2.velX += gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
-      const paket = {
-        id: id,
-        velX: gameState.player2.velX,
-      };
-      socket.send(JSON.stringify(paket));
-    };
+        const paket = {
+          id: id,
+          velX: gameState.player2.velX,
+        };
+        socket.send(JSON.stringify(paket));
+      }
     }
   }
 }

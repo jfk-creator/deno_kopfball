@@ -1,7 +1,8 @@
 let socket;
-let server_addr = "ws://77.179.182.49:420"
+let server_addr = "ws://77.187.0.31:420";
 let info = document.getElementById("info");
 let id = -1
+let predict = true
 
 
 function connectWebSocket() {
@@ -15,11 +16,19 @@ function connectWebSocket() {
 
 function handleConnection(socket) {
   socket.addEventListener("message", (event) => {
+    
     let paket = JSON.parse(event.data);
-    if(id === -1) id = paket.id
-    if(id > 2) console.error("I'm the third wheel of a bicycle :/")
-      console.log("i am player", id)
+    if(id === -1) {
+      id = paket.id
+      info.innerHTML += `you are Player${id}</br>`
+      if(id > 2) {
+        info.innerHTML += 'closing Connection.</br>' 
+        socket.close();
+      }
+    }
     gameState = paket.gs;
+    predict = false
+    console.log("paket arrived")
   });
   socket.addEventListener("close", () => {
     console.log("disconnected from server");
