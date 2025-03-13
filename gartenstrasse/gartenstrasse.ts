@@ -1,4 +1,5 @@
 const sockets = new Set<WebSocket>();
+let maxConnection = 400
 let socketCounter = 1;
 let gamestarted = false
 
@@ -6,9 +7,9 @@ Deno.serve({ port: 420 }, (request) => {
   if (request.headers.get("upgrade") !== "websocket") {
     return new Response(null, { status: 501 });
   }
-  if (sockets.size >= 2) {
+  if (sockets.size >= maxConnection) {
     console.error(
-      "Incomming connection denied. It's only a 2 player game. "
+      "Server full"
     );
     return new Response("Server full.", { status: 429});
   }
@@ -31,9 +32,11 @@ function handleSocket(socket: WebSocket) {
 
   socket.onmessage = (event) => {
     const paket = JSON.parse(event.data);
-    // console.log("Received message: ", paket)
+    console.log("Received message: ", paket)
     if(paket.id == 1) gameState.player1.velX = paket.velX
     if(paket.id == 2) gameState.player2.velX = paket.velX
+    if(paket.id == 3) gameState.player3.velX = paket.velX;
+    if(paket.id == 4) gameState.player4.velX = paket.velX;
 
   };
 
@@ -76,23 +79,42 @@ let gameState = {
   ballR: 5,
   tick: 0,
   hits: 0,
+  highscore: 0,
   player1: {
     posX: 20,
     posY: 540,
-    velX: 5,
+    velX: 1,
     velY: 0,
   },
   p1_custom: {
-    color: "#FF757F",
+    color: "#EFB662", //gold
   },
   player2: {
-    posX: 960 - 70,
+    posX: 20 + 120,
     posY: 540,
-    velX: -2,
+    velX: 1,
     velY: 0,
   },
   p2_custom: {
-    color: "#7DCFFF",
+    color: "#7DCFFF", //lightBlue
+  },
+  player3: {
+    posX: 20 + 240,
+    posY: 540,
+    velX: -1,
+    velY: 0,
+  },
+  p3_custom: {
+    color: "#9ECE6A", //Green
+  },
+  player4: {
+    posX: 20 + 360,
+    posY: 540,
+    velX: -1,
+    velY: 0,
+  },
+  p4_custom: {
+    color: "#FF757F", //Red
   },
   ball: {
     posX: 70,
@@ -116,23 +138,42 @@ function initGameState() {
     ballR: 5,
     tick: 0,
     hits: 0,
+    highscore: 0,
     player1: {
       posX: 20,
       posY: 540,
-      velX: 5,
+      velX: 1,
       velY: 0,
     },
     p1_custom: {
-      color: "#FF757F",
+      color: "#EFB662", //gold
     },
     player2: {
-      posX: 960 - 70,
+      posX: 20 + 120,
       posY: 540,
-      velX: -2,
+      velX: 1,
       velY: 0,
     },
     p2_custom: {
-      color: "#7DCFFF",
+      color: "#7DCFFF", //lightBlue
+    },
+    player3: {
+      posX: 20 + 240,
+      posY: 540,
+      velX: -1,
+      velY: 0,
+    },
+    p3_custom: {
+      color: "#9ECE6A", //Green
+    },
+    player4: {
+      posX: 20 + 360,
+      posY: 540,
+      velX: -1,
+      velY: 0,
+    },
+    p4_custom: {
+      color: "#FF757F", //Red
     },
     ball: {
       posX: 70,
@@ -150,6 +191,12 @@ async function runPhysics() {
   //player2
   gameState.player2 = move(gameState.player2);
   gameState.player2 = resistance(gameState.player2);
+  //player3
+  gameState.player3 = move(gameState.player3);
+  gameState.player3 = resistance(gameState.player3);
+  //player4
+  gameState.player4 = move(gameState.player4);
+  gameState.player4 = resistance(gameState.player4);
   //ball
   gameState.ball = move(gameState.ball);
   gameState.ball = ballPhysics(gameState.ball);
@@ -157,6 +204,8 @@ async function runPhysics() {
   checkBounds();
   kopfball(gameState.player1, gameState.ball);
   kopfball(gameState.player2, gameState.ball);
+  kopfball(gameState.player3, gameState.ball);
+  kopfball(gameState.player4, gameState.ball);
 }
 
 interface vec4 {
@@ -199,6 +248,7 @@ function kopfball(player: vec4, ball: vec4) {
     ball.posY > gameState.height - 100
   ) {
     gameState.hits++;
+    if(gameState.hits > gameState.highscore) gameState.highscore = gameState.hits
     gameState.ball.velY += gameState.hitForce;
     gameState.ball.velY *= -1;
     gameState.ball.velX += (ball.posX - player.posX - 25) / 25;

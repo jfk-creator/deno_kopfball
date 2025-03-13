@@ -14,20 +14,38 @@ let gameState = {
   player1: {
     posX: 20,
     posY: 540,
-    velX: 5,
+    velX: 1,
     velY: 0,
   },
   p1_custom: {
-    color: "#FF757F",
+    color: "#EFB662", //gold
   },
   player2: {
-    posX: 960 - 70,
+    posX: 20 + 120,
     posY: 540,
-    velX: -2,
+    velX: 1,
     velY: 0,
   },
   p2_custom: {
-    color: "#7DCFFF",
+    color: "#7DCFFF", //lightBlue
+  },
+  player3: {
+    posX: 20 + 240,
+    posY: 540,
+    velX: -1,
+    velY: 0,
+  },
+  p3_custom: {
+    color: "#9ECE6A", //Green
+  },
+  player4: {
+    posX: 20 + 360,
+    posY: 540,
+    velX: -1,
+    velY: 0,
+  },
+  p4_custom: {
+    color: "#FF757F", //Red
   },
   ball: {
     posX: 70,
@@ -54,20 +72,38 @@ function initGameState() {
     player1: {
       posX: 20,
       posY: 540,
-      velX: 5,
+      velX: 1,
       velY: 0,
     },
     p1_custom: {
-      color: "#FF757F",
+      color: "#EFB662", //gold
     },
     player2: {
-      posX: 960 - 70,
+      posX: 20 + 120,
       posY: 540,
-      velX: -2,
+      velX: 1,
       velY: 0,
     },
     p2_custom: {
-      color: "#7DCFFF",
+      color: "#7DCFFF", //lightBlue
+    },
+    player3: {
+      posX: 20 + 240,
+      posY: 540,
+      velX: -1,
+      velY: 0,
+    },
+    p3_custom: {
+      color: "#9ECE6A", //Green
+    },
+    player4: {
+      posX: 20 + 360,
+      posY: 540,
+      velX: -1,
+      velY: 0,
+    },
+    p4_custom: {
+      color: "#FF757F", //Red
     },
     ball: {
       posX: 70,
@@ -80,19 +116,27 @@ function initGameState() {
 
 console.log("Gamestate size (kb): " ,JSON.stringify(gameState).length*2)
 function runPhysics() {
-    //player1
-    gameState.player1 = move(gameState.player1);
-    gameState.player1 = resistance(gameState.player1);
-    //player2
-    gameState.player2 = move(gameState.player2);
-    gameState.player2 = resistance(gameState.player2);
-    //ball
-    gameState.ball = move(gameState.ball);
-    gameState.ball = ballPhysics(gameState.ball);
-    //CheckBounds for all objects: 
-    checkBounds();
-    kopfball(gameState.player1, gameState.ball);
-    kopfball(gameState.player2, gameState.ball);
+  //player1
+  gameState.player1 = move(gameState.player1);
+  gameState.player1 = resistance(gameState.player1);
+  //player2
+  gameState.player2 = move(gameState.player2);
+  gameState.player2 = resistance(gameState.player2);
+  //player3
+  gameState.player3 = move(gameState.player3);
+  gameState.player3 = resistance(gameState.player3);
+  //player4
+  gameState.player4 = move(gameState.player4);
+  gameState.player4 = resistance(gameState.player4);
+  //ball
+  gameState.ball = move(gameState.ball);
+  gameState.ball = ballPhysics(gameState.ball);
+  //CheckBounds for all objects:
+  checkBounds();
+  kopfball(gameState.player1, gameState.ball);
+  kopfball(gameState.player2, gameState.ball);
+  kopfball(gameState.player3, gameState.ball);
+  kopfball(gameState.player4, gameState.ball);
 }
 
 function move({posX, posY, velX, velY}) {
@@ -127,7 +171,10 @@ function kopfball(player, ball) {
     ball.posY < gameState.height - 85 &&
     ball.posY > gameState.height - 100
   ) {
-    gameState.hits++  
+    gameState.hits++ 
+    if (gameState.hits > gameState.highscore)
+          gameState.highscore = gameState.hits;
+ 
     gameState.ball.velY += gameState.hitForce;
     gameState.ball.velY *= -1;
     gameState.ball.velX += (ball.posX - player.posX - 25)/25;
@@ -156,12 +203,9 @@ function checkBounds() {
 // gameLoop
 
 let intervalId;
-let clientTick = 0;
-let maxTickDif = 0;
 
 function startGame() {
   intervalId = setInterval(() => {
-    clientTick++;
     runPhysics();
   }, 1000 / gameState.frameRate); 
 
@@ -172,20 +216,4 @@ function startGame() {
 }
 
 startGame()
-
-// let lastTime = performance.now();
-
-// function serverAnimationLoop() {
-//   const currentTime = performance.now();
-//   const deltaTime = currentTime - lastTime;
-//   lastTime = currentTime;
-
-//   clientTick++;
-//   runPhysics()
-//   const targetIntervalMs = 1000 / gameState.frameRate;
-//   const delay = Math.max(0, targetIntervalMs - deltaTime);
-//   setTimeout(serverAnimationLoop, delay);
-// }
-// serverAnimationLoop()
-// setTimeout(serverAnimationLoop, 0);
 

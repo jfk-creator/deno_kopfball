@@ -6,10 +6,14 @@ function setup() {
 }
 
 function draw() {
-      document.getElementById("hits").innerText = gameState.hits;
+  document.getElementById("hits").innerText = gameState.hits;
   background(20);  
-  drawPlayer(gameState.player1, gameState.p1_custom.color)
+  text("Hits: " + gameState.hits, 10, 20);
+  text("Highscore: " + gameState.highscore, 10, 35);
+  drawPlayer(gameState.player1, gameState.p1_custom.color);
   drawPlayer(gameState.player2, gameState.p2_custom.color);
+  drawPlayer(gameState.player3, gameState.p3_custom.color);
+  drawPlayer(gameState.player4, gameState.p4_custom.color);
   drawBall(gameState.ball, gameState.ballR);
 
   keyInput()
@@ -87,6 +91,54 @@ function keyInput() {
         const paket = {
           id: id,
           velX: gameState.player2.velX,
+        };
+        socket.send(JSON.stringify(paket));
+      }
+    }
+  }
+  if (id === 3) {
+    // a <-
+    if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
+      gameState.player3.velX = -gameState.movementSpeed;
+      if (socket.readyState === WebSocket.OPEN) {
+        const paket = {
+          id: id,
+          velX: gameState.player3.velX,
+        };
+        socket.send(JSON.stringify(paket));
+      }
+    }
+    // d ->d
+    if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
+      gameState.player3.velX = +gameState.movementSpeed;
+      if (socket.readyState === WebSocket.OPEN) {
+        const paket = {
+          id: id,
+          velX: gameState.player3.velX,
+        };
+        socket.send(JSON.stringify(paket));
+      }
+    }
+  }
+  if (id === 4) {
+    // a <-
+    if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
+      gameState.player4.velX = -gameState.movementSpeed;
+      if (socket.readyState === WebSocket.OPEN) {
+        const paket = {
+          id: id,
+          velX: gameState.player4.velX,
+        };
+        socket.send(JSON.stringify(paket));
+      }
+    }
+    // d ->d
+    if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
+      gameState.player4.velX = +gameState.movementSpeed;
+      if (socket.readyState === WebSocket.OPEN) {
+        const paket = {
+          id: id,
+          velX: gameState.player4.velX,
         };
         socket.send(JSON.stringify(paket));
       }
