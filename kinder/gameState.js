@@ -10,6 +10,7 @@ let gameState = {
   airDrag: 0.995,
   ballR: 5,
   tick: 0,
+  hits: 0,
   player1: {
     posX: 20,
     posY: 540,
@@ -49,6 +50,7 @@ function initGameState() {
     airDrag: 0.998,
     ballR: 5,
     tick: 0,
+    hits: 0,
     player1: {
       posX: 20,
       posY: 540,
@@ -125,7 +127,7 @@ function kopfball(player, ball) {
     ball.posY < gameState.height - 85 &&
     ball.posY > gameState.height - 100
   ) {
-    gameState.hits++
+    gameState.hits++  
     gameState.ball.velY += gameState.hitForce;
     gameState.ball.velY *= -1;
     gameState.ball.velX += (ball.posX - player.posX - 25)/25;
@@ -145,6 +147,9 @@ function checkBounds() {
   if (gameState.ball.posX < gameState.ballR) gameState.ball.velX *= -0.98;
   if (gameState.ball.posX > gameState.width - gameState.ballR)
     gameState.ball.velX *= -0.98;
-  if (gameState.ball.posY > gameState.height - gameState.ballR) gameState.ball.velY *= -0.98;
+  if (gameState.ball.posY > gameState.height - gameState.ballR) {
+    gameState.hits = 0;
+    gameState.ball.velY *= -0.98;
+  }
 }
 

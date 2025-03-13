@@ -75,6 +75,7 @@ let gameState = {
   airDrag: 0.995,
   ballR: 5,
   tick: 0,
+  hits: 0,
   player1: {
     posX: 20,
     posY: 540,
@@ -114,6 +115,7 @@ function initGameState() {
     airDrag: 0.995,
     ballR: 5,
     tick: 0,
+    hits: 0,
     player1: {
       posX: 20,
       posY: 540,
@@ -198,6 +200,7 @@ function kopfball(player: vec4, ball: vec4) {
     gameState.ball.velY += 5;
     gameState.ball.velY *= -1;
     gameState.ball.velX += (ball.posX - player.posX - 25) / 25;
+    gameState.hits++;
   }
 }
 
@@ -214,8 +217,10 @@ function checkBounds() {
   if (gameState.ball.posX < gameState.ballR) gameState.ball.velX *= -0.98;
   if (gameState.ball.posX > gameState.width - gameState.ballR)
     gameState.ball.velX *= -0.98;
-  if (gameState.ball.posY > gameState.height - gameState.ballR)
+  if (gameState.ball.posY > gameState.height - gameState.ballR){
+    gameState.hits = 0;
     gameState.ball.velY *= -0.98;
+  }
 }
 
 // gameLoop
@@ -224,9 +229,10 @@ let intervalId: number;
 
 function startGame() {
   intervalId = setInterval(() => {
-    runPhysics()
+    gameState.tick++;
+      runPhysics()
     broadcast()
-  }, 1000 / gameState.frameRate 
+  }, 1000 / gameState.frameRate
 ); 
 
   setTimeout(() => {

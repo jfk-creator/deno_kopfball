@@ -5,16 +5,14 @@ function setup() {
 }
 
 function draw() {
+      document.getElementById("hits").innerText = gameState.hits;
   background(20);  
   drawPlayer(gameState.player1, gameState.p1_custom.color)
   drawPlayer(gameState.player2, gameState.p2_custom.color);
   drawBall(gameState.ball, gameState.ballR);
 
-  if(predict) {
-    runPhysics()
-    console.log("predicted")
-  }
-  predict = true
+  runPhysics()
+  console.log("runPhysics")
   keyInput()
 }
 
