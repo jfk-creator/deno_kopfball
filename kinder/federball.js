@@ -21,7 +21,7 @@ function setup() {
 function draw() {
   if(gameState.player){
     background(20);  
-    fill(gameState.player[gameState.nextPlayer%gameState.player.length].color)
+    fill(gameState.player[gameState.nextPlayer].color)
     circle(width/2, 50, 50);
     text("Hits: " + gameState.hits, 10, 20);
     text("Highscore: " + gameState.highscore, 10, 35);

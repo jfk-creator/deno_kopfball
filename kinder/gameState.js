@@ -8,7 +8,7 @@ export let gameState = {
   resistance: 0.899,
   hitForce: 1.5,
   gravity: 0.25,
-  airDrag: 0.995,
+  airDrag: 0.9999,
   ballR: 5,
   tick: 0,
   hits: 0,
@@ -18,7 +18,7 @@ export let gameState = {
     { posX: 80, posY: 540, velX: 1, velY: 0, id: 1, color: "#9ECE6A" },
   ],
   ball: {
-    posX: 480,
+    posX: 460,
     posY: 20,
     velX: (Math.random()*8)-4,
     velY: -2,
@@ -37,7 +37,7 @@ export function initGameState() {
     resistance: 0.899,
     hitForce: 1.5,
     gravity: 0.25,
-    airDrag: 0.995,
+    airDrag: 0.9999,
     ballR: 5,
     tick: 0,
     hits: 0,
@@ -47,8 +47,8 @@ export function initGameState() {
       { posX: 80, posY: 540, velX: 1, velY: 0, id: 1, color: "#9ECE6A" },
     ],
     ball: {
-      posX: 70,
-      posY: 540 / 2,
+      posX: 460,
+      posY: 20,
       velX: Math.random() * 8 - 4,
       velY: -2,
     },
@@ -71,6 +71,15 @@ export function runPhysics(gs) {
 
   return gs
 
+}
+
+export function resetBall() {
+  return {
+      posX: 460,
+      posY: 20,
+      velX: Math.random() * 8 - 4,
+      velY: -2,
+    }
 }
 function movePlayer(player){
   player.posX += player.velX;
@@ -121,11 +130,15 @@ function kopfball(player, ball) {
     ball.posY < gameState.height - 85 &&
     ball.posY > gameState.height - 100
   ) {
-    console.log((gameState.nextPlayer) % gameState.player.length);
     
-    if(player.id == (gameState.nextPlayer) % gameState.player.length){
-      gameState.hits++ 
-      gameState.nextPlayer++
+
+    if(player.id == gameState.nextPlayer){
+      console.log("nextPlayer: ", gameState.nextPlayer);
+      console.log("playerId: ", gameState.nextPlayer);
+
+      gameState.hits++;
+      gameState.nextPlayer++;
+      if(gameState.nextPlayer >= gameState.playerCount) gameState.nextPlayer = 0;
     } else {
       gameState.hits = 0; 
     }

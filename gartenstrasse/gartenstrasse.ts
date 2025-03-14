@@ -1,7 +1,8 @@
-import {runPhysics, gameState, initGameState }from "../kinder/gameState.js";
+import {runPhysics, gameState, initGameState, resetBall }from "../kinder/gameState.js";
 const sockets = new Set<WebSocket>();
 const maxConnection = 10
 const colorArr = [
+  "#FF757F", // Tokyo Red
   "#EFB662", // Tokyo Gold
   "#7DCFFF", // Tokyo Skyblue
   "#7AA2F7", // Tokyo Blue
@@ -18,7 +19,7 @@ const colorArr = [
 ];
 let serverGameState = gameState;
 let socketCounter = 0;
-let gamestarted = false
+
 
 
 Deno.serve({ port: 420 }, (request) => {
@@ -38,10 +39,15 @@ Deno.serve({ port: 420 }, (request) => {
 
 function handleSocket(socket: WebSocket) {
   sockets.add(socket);
-  serverGameState = initGameState()
+  serverGameState.ball = resetBall()
   serverGameState.playerCount = sockets.size
-  serverGameState.player.push({ posX: serverGameState.width/2, posY: 540, velX: 1, velY: 0, id: sockets.size, color: colorArr[sockets.size%colorArr.length] })
-
+ 
+  serverGameState.player.push({ 
+      posX: 480, posY: 540, velX: 1, 
+      velY: 0, id: sockets.size-1, color: colorArr[sockets.size%colorArr.length] })
+    
+    console.log(serverGameState.player)
+    
   socket.onopen = () => {
     console.log(`we found player${socketCounter+1}`);
     const paket = {
