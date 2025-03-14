@@ -1,4 +1,5 @@
 import {runPhysics, gameState, initGameState, resetBall }from "../kinder/gameState.js";
+const debug = false;
 const sockets = new Set<WebSocket>();
 const maxConnection = 10
 const colorArr = [
@@ -20,8 +21,6 @@ const colorArr = [
 let serverGameState = gameState;
 let socketCounter = 0;
 
-
-
 Deno.serve({ port: 420 }, (request) => {
   if (request.headers.get("upgrade") !== "websocket") {
     return new Response(null, { status: 501 });
@@ -41,16 +40,23 @@ function handleSocket(socket: WebSocket) {
   sockets.add(socket);
   serverGameState.ball = resetBall()
   serverGameState.playerCount = sockets.size
- 
-  serverGameState.player.push({ 
-      posX: 480, posY: 540, velX: 1, 
-      velY: 0, id: sockets.size-1, color: colorArr[sockets.size%colorArr.length] })
-    
-    console.log(serverGameState.player)
+  console.log("player: ", gameState.player)
+    if(sockets.size > 2){
+      serverGameState.player.push({
+        posX: 480,
+        posY: 540,
+        velX: Math.random() * 50 - 25,
+        velY: 0,
+        id: socketCounter,
+        ping: 0,
+        color: colorArr[sockets.size % colorArr.length],
+      });
+    }
     
   socket.onopen = () => {
-    console.log(`we found player${socketCounter+1}`);
+    console.log(`we found player${socketCounter}`);
     const paket = {
+      type: "init",
       id: socketCounter++,
       gs: serverGameState,
     };
@@ -59,8 +65,18 @@ function handleSocket(socket: WebSocket) {
 
   socket.onmessage = (event) => {
     const paket = JSON.parse(event.data);
-    console.log("Received message: ", paket);
-    serverGameState.player[paket.id].velX = paket.velX
+    if(debug) console.log("Received message: ", paket);
+    if(paket.type == "move") serverGameState.player[paket.id].velX = paket.velX
+    if(paket.type == "ping"){
+      if(paket.pong) {
+        const pingPaket = {
+          type: "ping",
+          pong: false,
+          ping: false,
+          time: 0,
+        }
+      }
+    } 
   };
 
   socket.onclose = () => {
@@ -80,6 +96,7 @@ function broadcast() {
   for (const socket of sockets) {
     if (socket.readyState === WebSocket.OPEN) {
       const paket = {
+        type: "gameState",
         id: socketCounter,
         gs: serverGameState,
       };

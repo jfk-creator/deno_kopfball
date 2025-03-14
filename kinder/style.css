@@ -22,6 +22,7 @@ h1 {
 
 .boxes {
     display: flex;
+    flex-direction: column;
     justify-content: left;
     width: 960px;
 }

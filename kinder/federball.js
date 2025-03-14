@@ -33,8 +33,6 @@ function draw() {
     gameState = importedModule.runPhysics(gameState)
   }
 }
-
-
 function drawPlayer({ posX, posY, color}){
   fill(color);
   rect(posX, posY-100, 50, 100);
@@ -82,19 +80,21 @@ function keyInput() {
       gameState.player[id].velX = -gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
+          type: "move",
           id: id,
           velX: -5,
         };
         socket.send(JSON.stringify(paket));
       }
     }
-    // a <-
+    // d ->
     if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
       gameState.player[id].velX = -gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
+          type: "move",
           id: id,
-          velX: 5,
+          velX: 5
         };
         socket.send(JSON.stringify(paket));
       }
