@@ -108,13 +108,24 @@ function keyInput() {
         const paket = {
           type: "move",
           id: id,
-          velX: 5
+          velX: 5,
         };
         socket.send(JSON.stringify(paket));
       }
     }
-    if(mouseIsPressed){
-      if (mouseX < width/2) {
+    // p
+    if (keyIsDown(80)) {
+      console.log("reloading game")
+      if (socket.readyState === WebSocket.OPEN) {
+        const paket = {
+          type: "reload",
+          id: id
+        };
+        socket.send(JSON.stringify(paket));
+      }
+    }
+    if (mouseIsPressed) {
+      if (mouseX < width / 2) {
         gameState.player[id].velX = -gameState.movementSpeed;
         if (socket.readyState === WebSocket.OPEN) {
           const paket = {
@@ -132,7 +143,7 @@ function keyInput() {
           const paket = {
             type: "move",
             id: id,
-            velX: 5
+            velX: 5,
           };
           socket.send(JSON.stringify(paket));
         }

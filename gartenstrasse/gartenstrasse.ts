@@ -1,5 +1,5 @@
 import {runPhysics, gameState, initGameState, resetBall }from "../kinder/gameState.js";
-const debug = false;
+const debug = true;
 const sockets = new Set<WebSocket>();
 const maxConnection = 10
 const colorArr = [
@@ -79,6 +79,9 @@ function handleSocket(socket: WebSocket) {
         serverGameState.player[paket.id].ping = Math.floor(timePing);
       }
     } 
+    if(paket.type == "reload"){
+      serverGameState = initGameState()
+    }
   };
 
   socket.onclose = () => {
