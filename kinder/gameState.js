@@ -6,9 +6,9 @@ export let gameState = {
   playerWidth: 50,
   movementSpeed: 5,
   resistance: 0.899,
-  hitForce: 1.5,
-  gravity: 0.25,
-  airDrag: 0.9999,
+  hitForce: 0.8,
+  gravity: 0.1,
+  airDrag: 0.999,
   ballR: 5,
   tick: 0,
   hits: 0,
@@ -35,9 +35,9 @@ export function initGameState() {
     playerWidth: 50,
     movementSpeed: 5,
     resistance: 0.899,
-    hitForce: 1.5,
-    gravity: 0.25,
-    airDrag: 0.9999,
+    hitForce: 0.8,
+    gravity: 0.1,
+    airDrag: 0.999,
     ballR: 5,
     tick: 0,
     hits: 0,
@@ -105,7 +105,6 @@ function ballPhysics({ posX, posY, velX, velY }) {
   velY += gameState.gravity;
   velY *= gameState.airDrag;
   velX *= gameState.airDrag;
-  if (Math.abs(velY) < 0.001 && posY > gameState.height - 30) initGameState();
   if (posY > gameState.height) {
     velY *= -0.98;
     gameState.hits = 0;

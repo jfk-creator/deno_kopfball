@@ -13,7 +13,7 @@ function setup() {
         runPhysics = importedModule.runPhysics
         frameRate(gameState.frameRate)
   });
-  
+
   let canvas = createCanvas(960, 540);
   canvas.parent('theater');
 }
@@ -23,8 +23,7 @@ function draw() {
     background(20);  
     fill(gameState.player[gameState.nextPlayer].color)
     circle(width/2, 50, 50);
-    text("Hits: " + gameState.hits, 10, 20);
-    text("Highscore: " + gameState.highscore, 10, 35);
+    drawText()
     for (let i = 0; i < gameState.playerCount; i++) {
       let player = gameState.player[i];
       drawPlayer(player)
@@ -44,6 +43,17 @@ function drawPlayer({ posX, posY, color}){
 function drawBall(ball, radius){
   fill(180)
   circle(ball.posX, ball.posY, radius*2)
+}
+
+function drawText(){
+  const lineBreak = 25;
+  const offset = 35;
+  fill("#E5F0F4")
+    textSize(20);
+    textFont("Urbanist");
+    textAlign(RIGHT)
+    text("Highscore: " + gameState.highscore, gameState.width - 12, offset);
+    text("Score: " + gameState.hits, gameState.width-12, offset + lineBreak);
 }
 
 function keyInput() {
@@ -89,5 +99,6 @@ function keyInput() {
         socket.send(JSON.stringify(paket));
       }
     }
+    
   }
 }
