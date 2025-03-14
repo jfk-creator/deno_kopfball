@@ -22,8 +22,8 @@ h1 {
 
 .boxes {
     display: flex;
-    justify-content:space-around;
-    width: 80vw;
+    justify-content: left;
+    width: 960px;
 }
 
 :root {

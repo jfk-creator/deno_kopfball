@@ -1,26 +1,42 @@
+let importedModule
+let gameState
+let initGameState
+let runPhysics
 
 function setup() {
+  import("./gameState.js")
+  .then((module) => {
+    importedModule = module;
+
+        gameState = importedModule.gameState
+        initGameState = importedModule.initGameState
+        runPhysics = importedModule.runPhysics
+        frameRate(gameState.frameRate)
+  });
+  
   let canvas = createCanvas(960, 540);
   canvas.parent('theater');
-  frameRate(60)
 }
 
 function draw() {
-  document.getElementById("hits").innerText = gameState.hits;
-  background(20);  
-  text("Hits: " + gameState.hits, 10, 20);
-  text("Highscore: " + gameState.highscore, 10, 35);
-  drawPlayer(gameState.player1, gameState.p1_custom.color);
-  drawPlayer(gameState.player2, gameState.p2_custom.color);
-  drawPlayer(gameState.player3, gameState.p3_custom.color);
-  drawPlayer(gameState.player4, gameState.p4_custom.color);
-  drawBall(gameState.ball, gameState.ballR);
-
-  keyInput()
+  if(gameState.player){
+    background(20);  
+    fill(gameState.player[gameState.nextPlayer%gameState.player.length].color)
+    circle(width/2, 50, 50);
+    text("Hits: " + gameState.hits, 10, 20);
+    text("Highscore: " + gameState.highscore, 10, 35);
+    for (let i = 0; i < gameState.playerCount; i++) {
+      let player = gameState.player[i];
+      drawPlayer(player)
+    }
+    drawBall(gameState.ball, gameState.ballR);
+    keyInput()
+    gameState = importedModule.runPhysics(gameState)
+  }
 }
 
 
-function drawPlayer({ posX, posY}, color){
+function drawPlayer({ posX, posY, color}){
   fill(color);
   rect(posX, posY-100, 50, 100);
 }
@@ -34,111 +50,41 @@ function keyInput() {
   if (id === -1) {
     // a <-
     if (keyIsDown(65)) {
-      gameState.player1.velX = -gameState.movementSpeed;
+      gameState.player[0].velX = -gameState.movementSpeed;
     }
     // d ->
     if (keyIsDown(68)) {
-      gameState.player1.velX = gameState.movementSpeed;
+      gameState.player[0].velX = gameState.movementSpeed;
     }
     if (keyIsDown(LEFT_ARROW)) {
-      gameState.player2.velX = -gameState.movementSpeed;
+      gameState.player[1].velX = -gameState.movementSpeed;
     }
     if (keyIsDown(RIGHT_ARROW)) {
-      gameState.player2.velX = gameState.movementSpeed;
+      gameState.player[1].velX = gameState.movementSpeed;
     }
-    if (keyIsDown(82)) initGameState()
-  }
-  if(id === 1){
-      // a <-
-    if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
-      gameState.player1.velX = -gameState.movementSpeed;
-      if (socket.readyState === WebSocket.OPEN) {
-      const paket = {
-        id: id,
-        velX: gameState.player1.velX,
-      };
-      socket.send(JSON.stringify(paket));
+    // r
+    if (keyIsDown(82)) {
+      gameState = initGameState()
     }
-    }
-    // d ->
-    if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
-      gameState.player1.velX = +gameState.movementSpeed;
-      if (socket.readyState === WebSocket.OPEN) {
-        const paket = {
-          id: id,
-          velX: gameState.player1.velX,
-        };
-        socket.send(JSON.stringify(paket));
-      }
-    }
-  }
-  if (id === 2) {
+  } else {
     // a <-
     if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
-      gameState.player2.velX = -gameState.movementSpeed;
+      gameState.player[id].velX = -gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
           id: id,
-          velX: gameState.player2.velX,
+          velX: -5,
         };
         socket.send(JSON.stringify(paket));
       }
     }
-    // d ->d
-    if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
-      gameState.player2.velX = +gameState.movementSpeed;
-      if (socket.readyState === WebSocket.OPEN) {
-        const paket = {
-          id: id,
-          velX: gameState.player2.velX,
-        };
-        socket.send(JSON.stringify(paket));
-      }
-    }
-  }
-  if (id === 3) {
     // a <-
-    if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
-      gameState.player3.velX = -gameState.movementSpeed;
-      if (socket.readyState === WebSocket.OPEN) {
-        const paket = {
-          id: id,
-          velX: gameState.player3.velX,
-        };
-        socket.send(JSON.stringify(paket));
-      }
-    }
-    // d ->d
     if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
-      gameState.player3.velX = +gameState.movementSpeed;
+      gameState.player[id].velX = -gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
           id: id,
-          velX: gameState.player3.velX,
-        };
-        socket.send(JSON.stringify(paket));
-      }
-    }
-  }
-  if (id === 4) {
-    // a <-
-    if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
-      gameState.player4.velX = -gameState.movementSpeed;
-      if (socket.readyState === WebSocket.OPEN) {
-        const paket = {
-          id: id,
-          velX: gameState.player4.velX,
-        };
-        socket.send(JSON.stringify(paket));
-      }
-    }
-    // d ->d
-    if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
-      gameState.player4.velX = +gameState.movementSpeed;
-      if (socket.readyState === WebSocket.OPEN) {
-        const paket = {
-          id: id,
-          velX: gameState.player4.velX,
+          velX: 5,
         };
         socket.send(JSON.stringify(paket));
       }

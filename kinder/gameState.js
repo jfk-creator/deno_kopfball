@@ -1,5 +1,6 @@
-let gameState = {
+export let gameState = {
   frameRate: 90,
+  playerCount: 2,
   width: 960,
   height: 540,
   playerWidth: 50,
@@ -11,53 +12,24 @@ let gameState = {
   ballR: 5,
   tick: 0,
   hits: 0,
-  player1: {
-    posX: 20,
-    posY: 540,
-    velX: 1,
-    velY: 0,
-  },
-  p1_custom: {
-    color: "#EFB662", //gold
-  },
-  player2: {
-    posX: 20 + 120,
-    posY: 540,
-    velX: 1,
-    velY: 0,
-  },
-  p2_custom: {
-    color: "#7DCFFF", //lightBlue
-  },
-  player3: {
-    posX: 20 + 240,
-    posY: 540,
-    velX: -1,
-    velY: 0,
-  },
-  p3_custom: {
-    color: "#9ECE6A", //Green
-  },
-  player4: {
-    posX: 20 + 360,
-    posY: 540,
-    velX: -1,
-    velY: 0,
-  },
-  p4_custom: {
-    color: "#FF757F", //Red
-  },
+  highscore: 0,
+  player: [
+    { posX: 20, posY: 540, velX: 1, velY: 0, id: 0, color: "#FF757F" },
+    { posX: 80, posY: 540, velX: 1, velY: 0, id: 1, color: "#9ECE6A" },
+  ],
   ball: {
-    posX: 70,
-    posY: 540 / 2,
-    velX: 2,
+    posX: 480,
+    posY: 20,
+    velX: (Math.random()*8)-4,
     velY: -2,
   },
+  nextPlayer: 0,
 };
 
-function initGameState() {
+export function initGameState() {
   gameState = {
     frameRate: 90,
+    playerCount: 2,
     width: 960,
     height: 540,
     playerWidth: 50,
@@ -69,80 +41,54 @@ function initGameState() {
     ballR: 5,
     tick: 0,
     hits: 0,
-    player1: {
-      posX: 20,
-      posY: 540,
-      velX: 1,
-      velY: 0,
-    },
-    p1_custom: {
-      color: "#EFB662", //gold
-    },
-    player2: {
-      posX: 20 + 120,
-      posY: 540,
-      velX: 1,
-      velY: 0,
-    },
-    p2_custom: {
-      color: "#7DCFFF", //lightBlue
-    },
-    player3: {
-      posX: 20 + 240,
-      posY: 540,
-      velX: -1,
-      velY: 0,
-    },
-    p3_custom: {
-      color: "#9ECE6A", //Green
-    },
-    player4: {
-      posX: 20 + 360,
-      posY: 540,
-      velX: -1,
-      velY: 0,
-    },
-    p4_custom: {
-      color: "#FF757F", //Red
-    },
+    highscore: 0,
+    player: [
+      { posX: 20, posY: 540, velX: 1, velY: 0, id: 0, color: "#FF757F" },
+      { posX: 80, posY: 540, velX: 1, velY: 0, id: 1, color: "#9ECE6A" },
+    ],
     ball: {
       posX: 70,
       posY: 540 / 2,
-      velX: 2,
+      velX: Math.random() * 8 - 4,
       velY: -2,
     },
+    nextPlayer: 0,
   };
+  return gameState
 }
 
-console.log("Gamestate size (kb): " ,JSON.stringify(gameState).length*2)
-function runPhysics() {
-  //player1
-  gameState.player1 = move(gameState.player1);
-  gameState.player1 = resistance(gameState.player1);
-  //player2
-  gameState.player2 = move(gameState.player2);
-  gameState.player2 = resistance(gameState.player2);
-  //player3
-  gameState.player3 = move(gameState.player3);
-  gameState.player3 = resistance(gameState.player3);
-  //player4
-  gameState.player4 = move(gameState.player4);
-  gameState.player4 = resistance(gameState.player4);
-  //ball
-  gameState.ball = move(gameState.ball);
-  gameState.ball = ballPhysics(gameState.ball);
-  //CheckBounds for all objects:
-  checkBounds();
-  kopfball(gameState.player1, gameState.ball);
-  kopfball(gameState.player2, gameState.ball);
-  kopfball(gameState.player3, gameState.ball);
-  kopfball(gameState.player4, gameState.ball);
-}
+console.log("Gamestate size (kb): ", JSON.stringify(gameState).length*2)
 
-function move({posX, posY, velX, velY}) {
+export function runPhysics(gs) {
+  for(let i = 0; i < gs.player.length; i++){
+    gs.player[i] = movePlayer(gs.player[i]);
+  }
+  gs.ball = ballPhysics(gs.ball)
+  gs.ball = moveBall(gs.ball)
+  for (let i = 0; i < gs.player.length; i++) {
+    kopfball(gs.player[i], gs.ball);
+  }
+
+  return gs
+
+}
+function movePlayer(player){
+  player.posX += player.velX;
+  player.posY += player.velY;
+
+  if (player.posX < 0) player.posX += 10;
+  if (player.posX > gameState.width - gameState.playerWidth) player.posX += -10;
+  player = resistance(player);
+
+  return player;
+}
+function moveBall({posX, posY, velX, velY}) {
     posX += velX;
     posY += velY;
-    
+
+    if (posX < 0 + gameState.ballR) velX *= -1;
+    if (posX > gameState.width - gameState.ballR)
+      velX *= -1;;
     return {posX, posY, velX, velY}
 }
 
@@ -151,6 +97,10 @@ function ballPhysics({ posX, posY, velX, velY }) {
   velY *= gameState.airDrag;
   velX *= gameState.airDrag;
   if (Math.abs(velY) < 0.001 && posY > gameState.height - 30) initGameState();
+  if (posY > gameState.height) {
+    velY *= -0.98;
+    gameState.hits = 0;
+  }
   const factor = Math.pow(10, 10);
   velY = (Math.floor(velY * factor) / factor);
   return { posX, posY, velX, velY };
@@ -171,7 +121,14 @@ function kopfball(player, ball) {
     ball.posY < gameState.height - 85 &&
     ball.posY > gameState.height - 100
   ) {
-    gameState.hits++ 
+    console.log((gameState.nextPlayer) % gameState.player.length);
+    
+    if(player.id == (gameState.nextPlayer) % gameState.player.length){
+      gameState.hits++ 
+      gameState.nextPlayer++
+    } else {
+      gameState.hits = 0; 
+    }
     if (gameState.hits > gameState.highscore)
           gameState.highscore = gameState.hits;
  
@@ -181,39 +138,20 @@ function kopfball(player, ball) {
   };
 }
 
-function checkBounds() {
-  //player1
-  if (gameState.player1.posX < 0) gameState.player1.posX += 10;
-  if (gameState.player1.posX > gameState.width - gameState.playerWidth)
-    gameState.player1.posX += -10;
-  //player2
-  if (gameState.player2.posX < 0) gameState.player2.posX += 10;
-  if (gameState.player2.posX > gameState.width - gameState.playerWidth)
-    gameState.player2.posX += -10;
-  //ball
-  if (gameState.ball.posX < gameState.ballR) gameState.ball.velX *= -0.98;
-  if (gameState.ball.posX > gameState.width - gameState.ballR)
-    gameState.ball.velX *= -0.98;
-  if (gameState.ball.posY > gameState.height - gameState.ballR) {
-    gameState.hits = 0;
-    gameState.ball.velY *= -0.98;
-  }
-}
-
 // gameLoop
 
-let intervalId;
+// let intervalId;
 
-function startGame() {
-  intervalId = setInterval(() => {
-    runPhysics();
-  }, 1000 / gameState.frameRate); 
+// function startGame() {
+//   intervalId = setInterval(() => {
+//     runPhysics();
+//   }, 1000 / gameState.frameRate); 
 
-  setTimeout(() => {
-    clearInterval(intervalId);
-    console.log("Gameloop is over.");
-  }, 1000000); 
-}
+//   setTimeout(() => {
+//     clearInterval(intervalId);
+//     console.log("Gameloop is over.");
+//   }, 1000000); 
+// }
 
-startGame()
+// startGame()
 
