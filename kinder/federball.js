@@ -2,8 +2,9 @@ let importedModule
 let gameState
 let initGameState
 let runPhysics
-
+let playerInfo
 function setup() {
+  playerInfo = document.getElementById("players");
   import("./gameState.js")
   .then((module) => {
     importedModule = module;
@@ -19,18 +20,26 @@ function setup() {
 }
 
 function draw() {
-  if(gameState.player){
+  if(importedModule){
     background(20);  
-    fill(gameState.player[gameState.nextPlayer].color)
-    circle(width/2, 50, 50);
+    drawNextPlayerCircle()
     drawText()
     for (let i = 0; i < gameState.playerCount; i++) {
       let player = gameState.player[i];
       drawPlayer(player)
     }
     drawBall(gameState.ball, gameState.ballR);
+    
     keyInput()
     gameState = importedModule.runPhysics(gameState)
+
+    if(frameCount%10 == 0){
+      playerInfo.innerHTML = "";
+      for (let i = 0; i < gameState.playerCount; i++) {
+        let player = gameState.player[i];
+        playerInfo.innerHTML += `<span style="color: ${player.color}">player${player.id+1}: ${player.ping}</span></br>`;
+      }
+    }
   }
 }
 function drawPlayer({ posX, posY, color}){
@@ -52,6 +61,11 @@ function drawText(){
     textAlign(RIGHT)
     text("Highscore: " + gameState.highscore, gameState.width - 12, offset);
     text("Score: " + gameState.hits, gameState.width-12, offset + lineBreak);
+}
+
+function drawNextPlayerCircle(){
+  fill(gameState.player[gameState.nextPlayer].color)
+  circle(width/2, 50, 50);
 }
 
 function keyInput() {
@@ -99,6 +113,30 @@ function keyInput() {
         socket.send(JSON.stringify(paket));
       }
     }
-    
+    if(mouseIsPressed){
+      if (mouseX < width/2) {
+        gameState.player[id].velX = -gameState.movementSpeed;
+        if (socket.readyState === WebSocket.OPEN) {
+          const paket = {
+            type: "move",
+            id: id,
+            velX: -5,
+          };
+          socket.send(JSON.stringify(paket));
+        }
+      }
+      // ->
+      if (mouseX > width / 2) {
+        gameState.player[id].velX = -gameState.movementSpeed;
+        if (socket.readyState === WebSocket.OPEN) {
+          const paket = {
+            type: "move",
+            id: id,
+            velX: 5
+          };
+          socket.send(JSON.stringify(paket));
+        }
+      }
+    }
   }
 }

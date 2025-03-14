@@ -21,6 +21,13 @@ const colorArr = [
 let serverGameState = gameState;
 let socketCounter = 0;
 
+interface pingPakete {
+          type: string,
+          id: number,
+          pong: boolean,
+          time: number,
+}
+
 Deno.serve({ port: 420 }, (request) => {
   if (request.headers.get("upgrade") !== "websocket") {
     return new Response(null, { status: 501 });
@@ -38,8 +45,8 @@ Deno.serve({ port: 420 }, (request) => {
 
 function handleSocket(socket: WebSocket) {
   sockets.add(socket);
-  serverGameState.ball = resetBall()
-  serverGameState.playerCount = sockets.size
+  serverGameState.ball = resetBall();
+  serverGameState.playerCount = sockets.size;
   console.log("player: ", gameState.player)
     if(sockets.size > 2){
       serverGameState.player.push({
@@ -62,19 +69,14 @@ function handleSocket(socket: WebSocket) {
     };
     socket.send(JSON.stringify(paket));
   };
-
   socket.onmessage = (event) => {
     const paket = JSON.parse(event.data);
     if(debug) console.log("Received message: ", paket);
     if(paket.type == "move") serverGameState.player[paket.id].velX = paket.velX
     if(paket.type == "ping"){
       if(paket.pong) {
-        const pingPaket = {
-          type: "ping",
-          pong: false,
-          ping: false,
-          time: 0,
-        }
+        const timePing = performance.now() - paket.time ;
+        serverGameState.player[paket.id].ping = Math.floor(timePing);
       }
     } 
   };
@@ -101,6 +103,15 @@ function broadcast() {
         gs: serverGameState,
       };
       socket.send(JSON.stringify(paket));
+      if (serverGameState.tick % serverGameState.frameRate == 0) {
+        const pingPaket = {
+          type: "ping",
+          id: -1,
+          pong: false,
+          time: performance.now(),
+        };
+        socket.send(JSON.stringify(pingPaket))
+      }
     }
   }
 }

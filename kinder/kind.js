@@ -18,7 +18,6 @@ function connectWebSocket() {
 function handleConnection(socket) {
   socket.addEventListener("message", (event) => {
     let paket = JSON.parse(event.data);
-    console.log(paket)
     if(paket.type == "init" && !connectionInitialized) {
       id = paket.id
       info.innerHTML += `you are Player${id+1}</br>`
@@ -32,6 +31,13 @@ function handleConnection(socket) {
     if(connectionInitialized){
       if(paket.type == "gameState"){
         gameState = paket.gs;
+      }
+      if(paket.type == "ping"){
+        if(!paket.pong){
+          paket.pong = true;
+          paket.id = id
+          socket.send(JSON.stringify(paket));
+        }
       }
 
     }
