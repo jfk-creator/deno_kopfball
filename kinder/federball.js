@@ -42,9 +42,16 @@ function draw() {
     }
   }
 }
-function drawPlayer({ posX, posY, color}){
-  fill(color);
-  rect(posX, posY-100, 50, 100);
+function drawPlayer(player){
+  fill(player.color);
+  rect(
+    player.posX,
+    player.posY - gameState.playerHeight - gameState.playerOffset,
+    gameState.playerWidth,
+    gameState.playerHeight
+  );
+  textSize(16)
+  text(player.id, player.posX + gameState.playerWidth/2, gameState.height-5);
 }
 
 function drawBall(ball, radius){

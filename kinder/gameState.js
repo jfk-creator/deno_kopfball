@@ -3,7 +3,9 @@ export let gameState = {
   playerCount: 2,
   width: 960,
   height: 540,
-  playerWidth: 50,
+  playerWidth: 80,
+  playerHeight: 80,
+  playerOffset: 20,
   movementSpeed: 5,
   resistance: 0.8999,
   hitForce: 0.7,
@@ -48,7 +50,9 @@ export function initGameState() {
     playerCount: 2,
     width: 960,
     height: 540,
-    playerWidth: 50,
+    playerWidth: 80,
+    playerHeight: 80,
+    playerOffset: 20,
     movementSpeed: 5,
     resistance: 0.8999,
     hitForce: 0.7,
@@ -158,27 +162,28 @@ function kopfball(player, ball) {
     ball.posX - player.posX < gameState.playerWidth + 3 &&
     ball.posX - player.posX > -3 &&
     ball.velY > 0 &&
-    ball.posY < gameState.height - 85 &&
-    ball.posY > gameState.height - 100
+    ball.posY <
+      gameState.height - gameState.playerHeight - gameState.playerOffset + 15 &&
+    ball.posY >
+      gameState.height - gameState.playerHeight - gameState.playerOffset
   ) {
-    
-
-    if(player.id == gameState.nextPlayer){
+    if (player.id == gameState.nextPlayer) {
       console.log("nextPlayer: ", gameState.nextPlayer);
       console.log("playerId: ", gameState.nextPlayer);
 
       gameState.hits++;
       gameState.nextPlayer++;
-      if(gameState.nextPlayer >= gameState.playerCount) gameState.nextPlayer = 0;
+      if (gameState.nextPlayer >= gameState.playerCount)
+        gameState.nextPlayer = 0;
     } else {
-      gameState.hits = 0; 
+      gameState.hits = 0;
     }
     if (gameState.hits > gameState.highscore)
-          gameState.highscore = gameState.hits;
- 
+      gameState.highscore = gameState.hits;
+
     gameState.ball.velY += gameState.hitForce;
     gameState.ball.velY *= -1;
-    gameState.ball.velX += (ball.posX - player.posX - 25)/25;
+    gameState.ball.velX += (ball.posX - player.posX - 25) / 25;
   };
 }
 
