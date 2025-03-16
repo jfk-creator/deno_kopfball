@@ -36,6 +36,18 @@ interface pingPakete {
   time: number;
 }
 
+interface player {
+  posX: number;
+  posY: number;
+  velX: number;
+  velY: number;
+  id: number;
+  ping: number;
+  name: string;
+  color: string;
+  jumpCooldown: number;
+}
+
 function saId(): number {
   for (let i = 0; i < serverGameState.ids.length; i++) {
     if (serverGameState.ids[i] === 0) {
@@ -45,7 +57,7 @@ function saId(): number {
   return -1;
 }
 
-function getPlayerId(players: any, key: number) {
+function getPlayerId(players: player[], key: number) {
   for (let i = 0; i < players.length; i++) {
     if (players[i].id === key) {
       // if (debug) console.log(`found id: ${players[i].id} as: ${i}`);
@@ -55,7 +67,7 @@ function getPlayerId(players: any, key: number) {
   return -1;
 }
 
-function deletePlayer(players: any, key: number) {
+function deletePlayer(players: player[], key: number) {
   for (let i = 0; i < players.length; i++) {
     if (players[i].id === key) {
       console.log("Good bye player:", key);
@@ -82,7 +94,7 @@ Deno.serve({ port: 420 }, (request) => {
   return response;
 });
 
-function printPlayer(players: any) {
+function printPlayer(players: player[]) {
   console.log("%cActive players: ", "color: green");
   for (const player of players) {
     console.log(`Id: ${player.id}, Name: ${player.name}, Ping: ${player.ping}`);
