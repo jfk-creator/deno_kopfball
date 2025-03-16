@@ -18,6 +18,7 @@ export let gameState = {
   hits: 0,
   score: 0,
   highscore: 0,
+  ids: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   player: [
     {
       posX: 480,
@@ -28,17 +29,6 @@ export let gameState = {
       ping: 0,
       name: "Hans",
       color: "#FF757F",
-      jumpCooldown: 0,
-    },
-    {
-      posX: 480,
-      posY: 540,
-      velX: Math.random() * 50 - 25,
-      velY: 0,
-      id: 1,
-      ping: 0,
-      name: "Laura",
-      color: "#9ECE6A",
       jumpCooldown: 0,
     },
   ],
@@ -72,29 +62,30 @@ export function initGameState() {
     hits: 0,
     score: 0,
     highscore: 0,
+    ids: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     player: [
-      {
-        posX: 480,
-        posY: 540,
-        velX: Math.random() * 50 - 25,
-        velY: 0,
-        id: 0,
-        ping: 0,
-        name: "Hans",
-        color: "#FF757F",
-        jumpCooldown: 0,
-      },
-      {
-        posX: 480,
-        posY: 540,
-        velX: Math.random() * 50 - 25,
-        velY: 0,
-        id: 1,
-        ping: 0,
-        name: "Laura",
-        color: "#9ECE6A",
-        jumpCooldown: 0,
-      },
+      // {
+      //   posX: 480,
+      //   posY: 540,
+      //   velX: Math.random() * 50 - 25,
+      //   velY: 0,
+      //   id: 0,
+      //   ping: 0,
+      //   name: "Hans",
+      //   color: "#FF757F",
+      //   jumpCooldown: 0,
+      // },
+      // {
+      //   posX: 480,
+      //   posY: 540,
+      //   velX: Math.random() * 50 - 25,
+      //   velY: 0,
+      //   id: 1,
+      //   ping: 0,
+      //   name: "Laura",
+      //   color: "#9ECE6A",
+      //   jumpCooldown: 0,
+      // },
     ],
     ball: {
       posX: 460,
@@ -190,9 +181,6 @@ function kopfball(player, ball) {
     ball.posY > player.posY - gameState.playerHeight - gameState.playerOffset
   ) {
     if (player.id == gameState.nextPlayer) {
-      console.log("nextPlayer: ", gameState.nextPlayer);
-      console.log("playerId: ", gameState.nextPlayer);
-
       gameState.hits++;
       gameState.score += Math.floor((ball.velX + ball.velY) * Math.pow(10, 3));
       if (gameState.score > gameState.highscore) {
@@ -200,9 +188,10 @@ function kopfball(player, ball) {
         localStorage.setItem("highscore", gameState.highscore);
       }
 
-      gameState.nextPlayer++;
-      if (gameState.nextPlayer >= gameState.playerCount)
-        gameState.nextPlayer = 0;
+      gameState.nextPlayer = getNextPlayerId(
+        gameState.player,
+        gameState.nextPlayer
+      );
     } else {
       gameState.hits = 0;
       gameState.score = 0;
@@ -214,7 +203,16 @@ function kopfball(player, ball) {
       ((ball.posX - player.posX - gameState.playerWidth / 2) / 25) * 4;
   }
 }
+
 // #endregion
+function getNextPlayerId(players, key) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id === key) {
+      if (i < players.length - 1) return players[i + 1].id;
+      else return players[0].id;
+    }
+  }
+}
 // gameLoop
 
 // let intervalId;

@@ -12,6 +12,32 @@ function setup() {
     initGameState = importedModule.initGameState;
     runPhysics = importedModule.runPhysics;
     frameRate(gameState.frameRate);
+    if (!connectionInitialized) {
+      gameState.player.push({
+        posX: 480,
+        posY: 540,
+        velX: Math.random() * 50 - 25,
+        velY: 0,
+        id: 0,
+        ping: 0,
+        name: "Hans",
+        color: "#FF757F",
+        jumpCooldown: 0,
+      });
+      gameState.player.push({
+        posX: 480,
+        posY: 540,
+        velX: Math.random() * 50 - 25,
+        velY: 0,
+        id: 1,
+        ping: 0,
+        name: "Laura",
+        color: "#9ECE6A",
+        jumpCooldown: 0,
+      });
+    }
+    gameState.ids[0] = 1;
+    gameState.ids[1] = 1;
     const playerName = localStorage.getItem("playerName");
     const localHighscore = localStorage.getItem("highscore");
     if (playerName) {
@@ -29,9 +55,11 @@ function draw() {
     background(20);
     drawNextPlayerCircle();
     drawText();
-    for (let i = 0; i < gameState.playerCount; i++) {
-      let player = gameState.player[i];
-      drawPlayer(player);
+    for (let i = 0, k = 0; i < gameState.ids.length; i++) {
+      if (gameState.ids[i] === 1) {
+        let player = gameState.player[k++];
+        drawPlayer(player);
+      }
     }
     drawBall(gameState.ball, gameState.ballR);
 
@@ -40,7 +68,7 @@ function draw() {
 
     if (frameCount % 10 == 0) {
       playerInfo.innerHTML = "";
-      for (let i = 0; i < gameState.playerCount; i++) {
+      for (let i = 0; i < gameState.player.length; i++) {
         let player = gameState.player[i];
         playerInfo.innerHTML += `<span style="color: ${player.color}">${player.name}: ${player.ping}</span></br>`;
       }
@@ -83,8 +111,36 @@ function drawText() {
 }
 
 function drawNextPlayerCircle() {
-  fill(gameState.player[gameState.nextPlayer].color);
+  let playerId = getPlayerId(gameState.player, gameState.nextPlayer);
+  while (playerId === -1) {
+    gameState.nextPlayer = getNextPlayerId(
+      gameState.player,
+      gameState.playerId
+    );
+    console.log("nextPlayer: ", gameState.nextPlayer);
+    playerId = getPlayerId(gameState.player, gameState.nextPlayer);
+  }
+  fill(gameState.player[playerId].color);
   circle(width / 2, 50, 50);
+}
+
+function getPlayerId(players, key) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id === key) {
+      // if (debug) console.log(`found id: ${players[i].id} as: ${i}`);
+      return i;
+    }
+  }
+  return -1;
+}
+
+function getNextPlayerId(players, key) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id === key) {
+      if (i < players.length - 1) return players[i + 1].id;
+      else return players[0].id;
+    }
+  }
 }
 
 // #region keyInput
@@ -128,9 +184,10 @@ function keyInput() {
       gameState = initGameState();
     }
   } else {
+    const playerId = getPlayerId(gameState.player, id);
     // a <-
     if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
-      gameState.player[id].velX = -gameState.movementSpeed;
+      gameState.player[playerId].velX = -gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
           type: "moveL",
@@ -141,7 +198,7 @@ function keyInput() {
     }
     // d ->
     if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
-      gameState.player[id].velX = gameState.movementSpeed;
+      gameState.player[playerId].velX = gameState.movementSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
           type: "moveR",
@@ -152,7 +209,7 @@ function keyInput() {
     }
     //Dash a <-
     if ((keyIsDown(65) || keyIsDown(LEFT_ARROW)) && keyIsDown(SHIFT)) {
-      gameState.player[id].velX = -gameState.dashSpeed;
+      gameState.player[playerId].velX = -gameState.dashSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
           type: "dashL",
@@ -163,7 +220,7 @@ function keyInput() {
     }
     //Dash d ->
     if ((keyIsDown(68) || keyIsDown(RIGHT_ARROW)) && keyIsDown(SHIFT)) {
-      gameState.player[id].velX = gameState.dashSpeed;
+      gameState.player[playerId].velX = gameState.dashSpeed;
       if (socket.readyState === WebSocket.OPEN) {
         const paket = {
           type: "dashR",
@@ -185,7 +242,7 @@ function keyInput() {
     }
     if (mouseIsPressed) {
       if (mouseX < width / 2) {
-        gameState.player[id].velX = -gameState.movementSpeed;
+        gameState.player[playerId].velX = -gameState.movementSpeed;
         if (socket.readyState === WebSocket.OPEN) {
           const paket = {
             type: "moveL",
@@ -196,7 +253,7 @@ function keyInput() {
       }
       // ->
       if (mouseX > width / 2) {
-        gameState.player[id].velX = -gameState.movementSpeed;
+        gameState.player[playerId].velX = -gameState.movementSpeed;
         if (socket.readyState === WebSocket.OPEN) {
           const paket = {
             type: "moveR",

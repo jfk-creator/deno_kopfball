@@ -5,7 +5,8 @@ import {
   resetBall,
 } from "../kinder/gameState.js";
 const debug = true;
-const sockets = new Set<WebSocket>();
+// const sockets = new Set<WebSocket>();
+const sockets = new Map<number, WebSocket>();
 const maxConnection = 10;
 const colorArr = [
   "#FF757F", // Tokyo Red
@@ -23,6 +24,7 @@ const colorArr = [
   "#9933FF", // Violet
   "#FF3399", // Rose-Pink
 ];
+let onStartUp = true;
 let serverGameState = gameState;
 let socketCounter = 0;
 
@@ -33,7 +35,40 @@ interface pingPakete {
   time: number;
 }
 
+function saId(): number {
+  for (let i = 0; i < serverGameState.ids.length; i++) {
+    if (serverGameState.ids[i] === 0) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function getPlayerId(players: any, key: number) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id === key) {
+      // if (debug) console.log(`found id: ${players[i].id} as: ${i}`);
+      return i;
+    }
+  }
+  return -1;
+}
+
+function deletePlayer(players: any, key: number) {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id === key) {
+      console.log("removed:", players.splice(i, 1));
+      return players;
+    }
+  }
+  return players;
+}
+
 Deno.serve({ port: 420 }, (request) => {
+  if (onStartUp) {
+    onStartUp = false;
+    serverGameState.player = [];
+  }
   if (request.headers.get("upgrade") !== "websocket") {
     return new Response(null, { status: 501 });
   }
@@ -47,64 +82,73 @@ Deno.serve({ port: 420 }, (request) => {
 });
 
 function handleSocket(socket: WebSocket) {
-  sockets.add(socket);
+  const key = saId();
+  serverGameState.ids[saId()] = 1;
+  if (debug) console.log(serverGameState.ids);
+  // sockets.add(socket);
+  sockets.set(key, socket);
   serverGameState.ball = resetBall();
   serverGameState.playerCount = sockets.size;
-  console.log("player: ", gameState.player);
-  if (sockets.size > 2) {
-    serverGameState.player.push({
-      posX: 480,
-      posY: 540,
-      velX: Math.random() * 50 - 25,
-      velY: 0,
-      id: socketCounter,
-      ping: 0,
-      name: "Mr.Smith",
-      color: colorArr[sockets.size % colorArr.length],
-      jumpCooldown: 0,
-    });
-  }
+  serverGameState.player.push({
+    posX: 480,
+    posY: 540,
+    velX: Math.random() * 50 - 25,
+    velY: 0,
+    id: key,
+    ping: 0,
+    name: "Mr.Smith",
+    color: colorArr[key % colorArr.length],
+    jumpCooldown: 0,
+  });
+  console.log("player: ", serverGameState.player);
 
   socket.onopen = () => {
-    console.log(`we found player${socketCounter}`);
+    console.log(`we found player${key}`);
     const paket = {
       type: "init",
-      id: socketCounter++,
+      id: key,
       gs: serverGameState,
     };
     socket.send(JSON.stringify(paket));
   };
   socket.onmessage = (event) => {
     const paket = JSON.parse(event.data);
+    const playerId: number = getPlayerId(serverGameState.player, key);
+    if (playerId === -1) {
+      console.error(
+        "player wasn't found: " + serverGameState.player + "key: " + key
+      );
+      return;
+    }
     // #region ParseMessage
     if (debug) console.log("Received message: ", paket);
     if (paket.type === "changeName")
-      serverGameState.player[paket.id].name = paket.name;
+      serverGameState.player[playerId].name = paket.name;
     if (paket.type == "moveL")
-      serverGameState.player[paket.id].velX = -serverGameState.movementSpeed;
+      serverGameState.player[playerId].velX = -serverGameState.movementSpeed;
     if (paket.type == "moveR")
-      serverGameState.player[paket.id].velX = serverGameState.movementSpeed;
+      serverGameState.player[playerId].velX = serverGameState.movementSpeed;
     if (paket.type == "dashL")
-      serverGameState.player[paket.id].velX = -serverGameState.dashSpeed;
+      serverGameState.player[playerId].velX = -serverGameState.dashSpeed;
     if (paket.type == "dashR")
-      serverGameState.player[paket.id].velX = serverGameState.dashSpeed;
+      serverGameState.player[playerId].velX = serverGameState.dashSpeed;
     if (paket.type == "jump") {
       console.log(
-        performance.now() - serverGameState.player[paket.id].jumpCooldown
+        performance.now() - serverGameState.player[playerId].jumpCooldown
       );
       if (
-        performance.now() - serverGameState.player[paket.id].jumpCooldown >
+        performance.now() - serverGameState.player[playerId].jumpCooldown >
         500
       ) {
-        serverGameState.player[paket.id].velY = serverGameState.jumpSpeed;
-        serverGameState.player[paket.id].jumpCooldown = performance.now();
+        serverGameState.player[playerId].velY = serverGameState.jumpSpeed;
+        serverGameState.player[playerId].jumpCooldown = performance.now();
       }
     }
 
     if (paket.type == "ping") {
       if (paket.pong) {
         const timePing = performance.now() - paket.time;
-        serverGameState.player[paket.id].ping = Math.floor(timePing);
+        serverGameState.player[playerId].ping = Math.floor(timePing);
       }
     }
     if (paket.type == "reload") {
@@ -115,23 +159,31 @@ function handleSocket(socket: WebSocket) {
 
   socket.onclose = () => {
     console.log("WebSocket connection closed");
-    sockets.delete(socket);
+    // sockets.delete(socket);
+    sockets.delete(key);
+    serverGameState.player = deletePlayer(serverGameState.player, key);
+    console.log(serverGameState.player);
     socketCounter--;
-    serverGameState = initGameState();
+    serverGameState.ids[key] = 0;
+    if (serverGameState.player.length != 0)
+      serverGameState.nextPlayer = serverGameState.player[0].id;
+    console.log(serverGameState.ids);
+    // serverGameState = initGameState();
   };
 
   socket.onerror = (error) => {
     console.error("WebSocket error: ", error);
-    sockets.delete(socket);
+    // sockets.delete(socket);
+    sockets.delete(key);
   };
 }
 
 function broadcast() {
-  for (const socket of sockets) {
+  for (const [id, socket] of sockets.entries()) {
     if (socket.readyState === WebSocket.OPEN) {
       const paket = {
         type: "gameState",
-        id: socketCounter,
+        id: id,
         gs: serverGameState,
       };
       socket.send(JSON.stringify(paket));
