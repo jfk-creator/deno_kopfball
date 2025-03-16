@@ -4,7 +4,8 @@ import {
   initGameState,
   resetBall,
 } from "../kinder/gameState.js";
-const debug = true;
+
+const debug = false;
 // const sockets = new Set<WebSocket>();
 const sockets = new Map<number, WebSocket>();
 const maxConnection = 10;
@@ -57,7 +58,7 @@ function getPlayerId(players: any, key: number) {
 function deletePlayer(players: any, key: number) {
   for (let i = 0; i < players.length; i++) {
     if (players[i].id === key) {
-      console.log("removed:", players.splice(i, 1));
+      console.log("Good bye player:", key);
       return players;
     }
   }
@@ -81,11 +82,17 @@ Deno.serve({ port: 420 }, (request) => {
   return response;
 });
 
+function printPlayer(players: any) {
+  console.log("%cActive players: ", "color: green");
+  for (const player of players) {
+    console.log(`Id: ${player.id}, Name: ${player.name}, Ping: ${player.ping}`);
+  }
+}
+
 function handleSocket(socket: WebSocket) {
   const key = saId();
   serverGameState.ids[saId()] = 1;
   if (debug) console.log(serverGameState.ids);
-  // sockets.add(socket);
   sockets.set(key, socket);
   serverGameState.ball = resetBall();
   serverGameState.playerCount = sockets.size;
@@ -100,10 +107,8 @@ function handleSocket(socket: WebSocket) {
     color: colorArr[key % colorArr.length],
     jumpCooldown: 0,
   });
-  console.log("player: ", serverGameState.player);
 
   socket.onopen = () => {
-    console.log(`we found player${key}`);
     const paket = {
       type: "init",
       id: key,
@@ -122,8 +127,14 @@ function handleSocket(socket: WebSocket) {
     }
     // #region ParseMessage
     if (debug) console.log("Received message: ", paket);
-    if (paket.type === "changeName")
+    if (paket.type === "changeName") {
+      console.log(
+        `%c${serverGameState.player[playerId].name}changed his name to: ${paket.name}`,
+        "color: orange; font-weight: bold;"
+      );
       serverGameState.player[playerId].name = paket.name;
+      printPlayer(gameState.player);
+    }
     if (paket.type == "moveL")
       serverGameState.player[playerId].velX = -serverGameState.movementSpeed;
     if (paket.type == "moveR")
@@ -200,6 +211,14 @@ function broadcast() {
   }
 }
 
+// #region: printPing
+function printPing() {
+  setInterval(() => {
+    printPlayer(serverGameState.player);
+  }, 50000);
+}
+
+printPing();
 // gameLoop
 
 let intervalId: number;
