@@ -61,6 +61,7 @@ function handleSocket(socket: WebSocket) {
       ping: 0,
       name: "Mr.Smith",
       color: colorArr[sockets.size % colorArr.length],
+      jumpCooldown: 0,
     });
   }
 
@@ -87,6 +88,18 @@ function handleSocket(socket: WebSocket) {
       serverGameState.player[paket.id].velX = -serverGameState.dashSpeed;
     if (paket.type == "dashR")
       serverGameState.player[paket.id].velX = serverGameState.dashSpeed;
+    if (paket.type == "jump") {
+      console.log(
+        performance.now() - serverGameState.player[paket.id].jumpCooldown
+      );
+      if (
+        performance.now() - serverGameState.player[paket.id].jumpCooldown >
+        500
+      ) {
+        serverGameState.player[paket.id].velY = serverGameState.jumpSpeed;
+        serverGameState.player[paket.id].jumpCooldown = performance.now();
+      }
+    }
 
     if (paket.type == "ping") {
       if (paket.pong) {

@@ -67,7 +67,7 @@ function drawPlayer(player) {
 // #endregion
 
 function drawBall(ball, radius) {
-  fill(180);
+  fill(200);
   circle(ball.posX, ball.posY, radius * 2);
 }
 
@@ -188,9 +188,8 @@ function keyInput() {
         gameState.player[id].velX = -gameState.movementSpeed;
         if (socket.readyState === WebSocket.OPEN) {
           const paket = {
-            type: "move",
+            type: "moveL",
             id: id,
-            velX: -5,
           };
           socket.send(JSON.stringify(paket));
         }
@@ -200,9 +199,8 @@ function keyInput() {
         gameState.player[id].velX = -gameState.movementSpeed;
         if (socket.readyState === WebSocket.OPEN) {
           const paket = {
-            type: "move",
+            type: "moveR",
             id: id,
-            velX: 5,
           };
           socket.send(JSON.stringify(paket));
         }
@@ -213,7 +211,28 @@ function keyInput() {
 // #endregion
 
 function keyPressed() {
-  if (keyCode === 87) gameState.player[0].velY = gameState.jumpSpeed;
-
-  if (keyCode === UP_ARROW) gameState.player[1].velY = gameState.jumpSpeed;
+  if (id === -1) {
+    if (keyCode === 87 && Date.now() - gameState.player[0].jumpCooldown > 600) {
+      gameState.player[0].jumpCooldown = Date.now();
+      gameState.player[0].velY = gameState.jumpSpeed;
+    }
+    if (
+      keyCode === UP_ARROW &&
+      Date.now() - gameState.player[1].jumpCooldown > 600
+    ) {
+      gameState.player[1].jumpCooldown = Date.now();
+      gameState.player[1].velY = gameState.jumpSpeed;
+    }
+  } else {
+    if (keyCode === 87 || keyCode === UP_ARROW) {
+      gameState.player[0].velY = gameState.jumpSpeed;
+      if (socket.readyState === WebSocket.OPEN) {
+        const paket = {
+          type: "jump",
+          id: id,
+        };
+        socket.send(JSON.stringify(paket));
+      }
+    }
+  }
 }

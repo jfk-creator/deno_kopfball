@@ -7,12 +7,12 @@ export let gameState = {
   playerHeight: 80,
   playerOffset: 20,
   movementSpeed: 5,
-  jumpSpeed: -2,
+  jumpSpeed: -3,
   dashSpeed: 15,
   resistance: 0.8999,
-  hitForce: 0.7,
+  hitForce: 1.2,
   gravity: 0.1,
-  airDrag: 0.999,
+  airDrag: 0.995,
   ballR: 5,
   tick: 0,
   hits: 0,
@@ -28,6 +28,7 @@ export let gameState = {
       ping: 0,
       name: "Hans",
       color: "#FF757F",
+      jumpCooldown: 0,
     },
     {
       posX: 480,
@@ -38,6 +39,7 @@ export let gameState = {
       ping: 0,
       name: "Laura",
       color: "#9ECE6A",
+      jumpCooldown: 0,
     },
   ],
   ball: {
@@ -59,12 +61,12 @@ export function initGameState() {
     playerHeight: 80,
     playerOffset: 20,
     movementSpeed: 5,
-    jumpSpeed: -2,
+    jumpSpeed: -3,
     dashSpeed: 15,
     resistance: 0.8999,
-    hitForce: 0.7,
+    hitForce: 0.5,
     gravity: 0.1,
-    airDrag: 0.999,
+    airDrag: 0.995,
     ballR: 5,
     tick: 0,
     hits: 0,
@@ -80,6 +82,7 @@ export function initGameState() {
         ping: 0,
         name: "Hans",
         color: "#FF757F",
+        jumpCooldown: 0,
       },
       {
         posX: 480,
@@ -90,6 +93,7 @@ export function initGameState() {
         ping: 0,
         name: "Laura",
         color: "#9ECE6A",
+        jumpCooldown: 0,
       },
     ],
     ball: {
@@ -160,8 +164,9 @@ function ballPhysics({ posX, posY, velX, velY }) {
   velY *= gameState.airDrag;
   velX *= gameState.airDrag;
   if (posY > gameState.height) {
-    velY *= -0.98;
+    velY *= -0.999;
     gameState.hits = 0;
+    gameState.score = 0;
   }
   const factor = Math.pow(10, 10);
   velY = Math.floor(velY * factor) / factor;
@@ -200,9 +205,10 @@ function kopfball(player, ball) {
         gameState.nextPlayer = 0;
     } else {
       gameState.hits = 0;
+      gameState.score = 0;
     }
 
-    gameState.ball.velY += gameState.hitForce;
+    gameState.ball.velY += -player.velY * gameState.hitForce;
     gameState.ball.velY *= -1;
     gameState.ball.velX +=
       ((ball.posX - player.posX - gameState.playerWidth / 2) / 25) * 4;
