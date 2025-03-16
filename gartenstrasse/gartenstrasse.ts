@@ -215,7 +215,7 @@ function broadcast() {
 function printPing() {
   setInterval(() => {
     printPlayer(serverGameState.player);
-  }, 50000);
+  }, 5000);
 }
 
 printPing();
