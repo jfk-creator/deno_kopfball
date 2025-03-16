@@ -16,8 +16,8 @@ function setup() {
     const localHighscore = localStorage.getItem("highscore");
     if (playerName) {
       gameState.player[0].name = playerName;
-      gameState.highscore = localHighscore;
     }
+    if (localHighscore) gameState.highscore = localHighscore;
   });
 
   let canvas = createCanvas(960, 540);
@@ -47,6 +47,7 @@ function draw() {
     }
   }
 }
+// #region DrawPlayer
 function drawPlayer(player) {
   fill(player.color);
   rect(
@@ -63,6 +64,7 @@ function drawPlayer(player) {
     gameState.height - 5
   );
 }
+// #endregion
 
 function drawBall(ball, radius) {
   fill(180);
@@ -89,20 +91,37 @@ function drawNextPlayerCircle() {
 function keyInput() {
   if (id === -1) {
     // a <-
-    if (keyIsDown(65) || keyIsDown(LEFT_ARROW)) {
+    if (keyIsDown(65)) {
       gameState.player[0].velX = -gameState.movementSpeed;
     }
     // d ->
-    if (keyIsDown(68) || keyIsDown(RIGHT_ARROW)) {
+    if (keyIsDown(68)) {
       gameState.player[0].velX = gameState.movementSpeed;
     }
     // DASH a <-
-    if ((keyIsDown(65) || keyIsDown(LEFT_ARROW)) && keyIsDown(SHIFT)) {
+    if (keyIsDown(65) && keyIsDown(SHIFT)) {
       gameState.player[0].velX = -gameState.dashSpeed;
     }
     // DASH d ->
-    if ((keyIsDown(68) || keyIsDown(RIGHT_ARROW)) && keyIsDown(SHIFT)) {
+    if (keyIsDown(68) && keyIsDown(SHIFT)) {
       gameState.player[0].velX = gameState.dashSpeed;
+    }
+    // Player2
+    if (keyIsDown(LEFT_ARROW)) {
+      gameState.player[1].velX = -gameState.movementSpeed;
+    }
+    // Player2
+    if (keyIsDown(RIGHT_ARROW)) {
+      gameState.player[1].velX = gameState.movementSpeed;
+    }
+
+    // DASH a <-
+    if (keyIsDown(LEFT_ARROW) && keyIsDown(SHIFT)) {
+      gameState.player[1].velX = -gameState.dashSpeed;
+    }
+    // DASH d ->
+    if (keyIsDown(RIGHT_ARROW) && keyIsDown(SHIFT)) {
+      gameState.player[1].velX = gameState.dashSpeed;
     }
     // r
     if (keyIsDown(82) && keyIsDown(CONTROL)) {
@@ -192,3 +211,9 @@ function keyInput() {
   }
 }
 // #endregion
+
+function keyPressed() {
+  if (keyCode === 87) gameState.player[0].velY = gameState.jumpSpeed;
+
+  if (keyCode === UP_ARROW) gameState.player[1].velY = gameState.jumpSpeed;
+}

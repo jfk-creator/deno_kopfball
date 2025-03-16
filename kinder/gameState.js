@@ -7,6 +7,7 @@ export let gameState = {
   playerHeight: 80,
   playerOffset: 20,
   movementSpeed: 5,
+  jumpSpeed: -2,
   dashSpeed: 15,
   resistance: 0.8999,
   hitForce: 0.7,
@@ -58,6 +59,7 @@ export function initGameState() {
     playerHeight: 80,
     playerOffset: 20,
     movementSpeed: 5,
+    jumpSpeed: -2,
     dashSpeed: 15,
     resistance: 0.8999,
     hitForce: 0.7,
@@ -131,9 +133,19 @@ function movePlayer(player) {
   if (player.posX < 0) player.posX += 10;
   if (player.posX > gameState.width - gameState.playerWidth) player.posX += -10;
   player = resistance(player);
+  player = playerPhysics(player);
+  return player;
+}
+function playerPhysics(player) {
+  if (player.posY <= gameState.height) player.velY += gameState.gravity * 2;
+  else {
+    player.velY = 0;
+    player.posY = gameState.height;
+  }
 
   return player;
 }
+
 function moveBall({ posX, posY, velX, velY }) {
   posX += velX;
   posY += velY;
@@ -169,9 +181,8 @@ function kopfball(player, ball) {
     ball.posX - player.posX > -3 &&
     ball.velY > 0 &&
     ball.posY <
-      gameState.height - gameState.playerHeight - gameState.playerOffset + 15 &&
-    ball.posY >
-      gameState.height - gameState.playerHeight - gameState.playerOffset
+      player.posY - gameState.playerHeight - gameState.playerOffset + 15 &&
+    ball.posY > player.posY - gameState.playerHeight - gameState.playerOffset
   ) {
     if (player.id == gameState.nextPlayer) {
       console.log("nextPlayer: ", gameState.nextPlayer);
@@ -179,9 +190,10 @@ function kopfball(player, ball) {
 
       gameState.hits++;
       gameState.score += Math.floor((ball.velX + ball.velY) * Math.pow(10, 3));
-      if (gameState.hits > gameState.highscore)
+      if (gameState.score > gameState.highscore) {
         gameState.highscore = gameState.score;
-      localStorage.setItem("highscore", gameState.highscore);
+        localStorage.setItem("highscore", gameState.highscore);
+      }
 
       gameState.nextPlayer++;
       if (gameState.nextPlayer >= gameState.playerCount)
