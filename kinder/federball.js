@@ -13,6 +13,7 @@ function setup() {
     runPhysics = importedModule.runPhysics;
     frameRate(gameState.frameRate);
     if (!connectionInitialized) {
+      gameState.player = [];
       gameState.player.push({
         posX: 480,
         posY: 540,
