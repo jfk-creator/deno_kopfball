@@ -28,12 +28,26 @@ canvas {
   -ms-user-select: none; /* For Internet Explorer/Edge */
 }
 
+button, input {
+    font-family: 'Urbanist';
+    background-color: var(--night);
+    color: var(--gold);
+    border-color: var(--gold);
+    margin-top: 25px;
+    padding: 5px 10px 5px 10px;
+    min-width: 40px;
+    max-width: 100px;
+    border-radius: 5px;
+}
+
 .boxes {
     display: flex;
     flex-direction: column;
     justify-content: left;
     width: 960px;
 }
+
+
 
 :root {
     --night: #1A1B26;

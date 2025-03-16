@@ -7,6 +7,7 @@ export let gameState = {
   playerHeight: 80,
   playerOffset: 20,
   movementSpeed: 5,
+  dashSpeed: 15,
   resistance: 0.8999,
   hitForce: 0.7,
   gravity: 0.1,
@@ -14,6 +15,7 @@ export let gameState = {
   ballR: 5,
   tick: 0,
   hits: 0,
+  score: 0,
   highscore: 0,
   player: [
     {
@@ -23,6 +25,7 @@ export let gameState = {
       velY: 0,
       id: 0,
       ping: 0,
+      name: "Hans",
       color: "#FF757F",
     },
     {
@@ -32,6 +35,7 @@ export let gameState = {
       velY: 0,
       id: 1,
       ping: 0,
+      name: "Laura",
       color: "#9ECE6A",
     },
   ],
@@ -54,6 +58,7 @@ export function initGameState() {
     playerHeight: 80,
     playerOffset: 20,
     movementSpeed: 5,
+    dashSpeed: 15,
     resistance: 0.8999,
     hitForce: 0.7,
     gravity: 0.1,
@@ -61,6 +66,7 @@ export function initGameState() {
     ballR: 5,
     tick: 0,
     hits: 0,
+    score: 0,
     highscore: 0,
     player: [
       {
@@ -70,6 +76,7 @@ export function initGameState() {
         velY: 0,
         id: 0,
         ping: 0,
+        name: "Hans",
         color: "#FF757F",
       },
       {
@@ -79,6 +86,7 @@ export function initGameState() {
         velY: 0,
         id: 1,
         ping: 0,
+        name: "Laura",
         color: "#9ECE6A",
       },
     ],
@@ -90,34 +98,33 @@ export function initGameState() {
     },
     nextPlayer: 0,
   };
-  return gameState
+  return gameState;
 }
 
-console.log("Gamestate size (kb): ", JSON.stringify(gameState).length*2)
+console.log("Gamestate size (kb): ", JSON.stringify(gameState).length * 2);
 
 export function runPhysics(gs) {
-  for(let i = 0; i < gs.player.length; i++){
+  for (let i = 0; i < gs.player.length; i++) {
     gs.player[i] = movePlayer(gs.player[i]);
   }
-  gs.ball = ballPhysics(gs.ball)
-  gs.ball = moveBall(gs.ball)
+  gs.ball = ballPhysics(gs.ball);
+  gs.ball = moveBall(gs.ball);
   for (let i = 0; i < gs.player.length; i++) {
     kopfball(gs.player[i], gs.ball);
   }
 
-  return gs
-
+  return gs;
 }
 
 export function resetBall() {
   return {
-      posX: 460,
-      posY: 20,
-      velX: Math.random() * 8 - 4,
-      velY: -2,
-    }
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+  };
 }
-function movePlayer(player){
+function movePlayer(player) {
   player.posX += player.velX;
   player.posY += player.velY;
 
@@ -127,14 +134,13 @@ function movePlayer(player){
 
   return player;
 }
-function moveBall({posX, posY, velX, velY}) {
-    posX += velX;
-    posY += velY;
+function moveBall({ posX, posY, velX, velY }) {
+  posX += velX;
+  posY += velY;
 
-    if (posX < 0 + gameState.ballR) velX *= -1;
-    if (posX > gameState.width - gameState.ballR)
-      velX *= -1;;
-    return {posX, posY, velX, velY}
+  if (posX < 0 + gameState.ballR) velX *= -1;
+  if (posX > gameState.width - gameState.ballR) velX *= -1;
+  return { posX, posY, velX, velY };
 }
 
 function ballPhysics({ posX, posY, velX, velY }) {
@@ -146,7 +152,7 @@ function ballPhysics({ posX, posY, velX, velY }) {
     gameState.hits = 0;
   }
   const factor = Math.pow(10, 10);
-  velY = (Math.floor(velY * factor) / factor);
+  velY = Math.floor(velY * factor) / factor;
   return { posX, posY, velX, velY };
 }
 
@@ -154,9 +160,9 @@ function resistance(player) {
   player.velX *= gameState.resistance;
   const factor = Math.pow(10, 10);
   player.velY = Math.floor(player.velY * factor) / factor;
-  return player
+  return player;
 }
-
+// #region Kopfball
 function kopfball(player, ball) {
   if (
     ball.posX - player.posX < gameState.playerWidth + 3 &&
@@ -172,21 +178,25 @@ function kopfball(player, ball) {
       console.log("playerId: ", gameState.nextPlayer);
 
       gameState.hits++;
+      gameState.score += Math.floor((ball.velX + ball.velY) * Math.pow(10, 3));
+      if (gameState.hits > gameState.highscore)
+        gameState.highscore = gameState.score;
+      localStorage.setItem("highscore", gameState.highscore);
+
       gameState.nextPlayer++;
       if (gameState.nextPlayer >= gameState.playerCount)
         gameState.nextPlayer = 0;
     } else {
       gameState.hits = 0;
     }
-    if (gameState.hits > gameState.highscore)
-      gameState.highscore = gameState.hits;
 
     gameState.ball.velY += gameState.hitForce;
     gameState.ball.velY *= -1;
-    gameState.ball.velX += (ball.posX - player.posX - 25) / 25;
-  };
+    gameState.ball.velX +=
+      ((ball.posX - player.posX - gameState.playerWidth / 2) / 25) * 4;
+  }
 }
-
+// #endregion
 // gameLoop
 
 // let intervalId;
@@ -194,13 +204,12 @@ function kopfball(player, ball) {
 // function startGame() {
 //   intervalId = setInterval(() => {
 //     runPhysics();
-//   }, 1000 / gameState.frameRate); 
+//   }, 1000 / gameState.frameRate);
 
 //   setTimeout(() => {
 //     clearInterval(intervalId);
 //     console.log("Gameloop is over.");
-//   }, 1000000); 
+//   }, 1000000);
 // }
 
 // startGame()
-

@@ -1,7 +1,12 @@
-import {runPhysics, gameState, initGameState, resetBall }from "../kinder/gameState.js";
+import {
+  runPhysics,
+  gameState,
+  initGameState,
+  resetBall,
+} from "../kinder/gameState.js";
 const debug = true;
 const sockets = new Set<WebSocket>();
-const maxConnection = 10
+const maxConnection = 10;
 const colorArr = [
   "#FF757F", // Tokyo Red
   "#EFB662", // Tokyo Gold
@@ -22,10 +27,10 @@ let serverGameState = gameState;
 let socketCounter = 0;
 
 interface pingPakete {
-          type: string,
-          id: number,
-          pong: boolean,
-          time: number,
+  type: string;
+  id: number;
+  pong: boolean;
+  time: number;
 }
 
 Deno.serve({ port: 420 }, (request) => {
@@ -33,10 +38,8 @@ Deno.serve({ port: 420 }, (request) => {
     return new Response(null, { status: 501 });
   }
   if (sockets.size >= maxConnection) {
-    console.error(
-      "Server full"
-    );
-    return new Response("Server full.", { status: 429});
+    console.error("Server full");
+    return new Response("Server full.", { status: 429 });
   }
   const { socket, response } = Deno.upgradeWebSocket(request);
   handleSocket(socket);
@@ -47,19 +50,20 @@ function handleSocket(socket: WebSocket) {
   sockets.add(socket);
   serverGameState.ball = resetBall();
   serverGameState.playerCount = sockets.size;
-  console.log("player: ", gameState.player)
-    if(sockets.size > 2){
-      serverGameState.player.push({
-        posX: 480,
-        posY: 540,
-        velX: Math.random() * 50 - 25,
-        velY: 0,
-        id: socketCounter,
-        ping: 0,
-        color: colorArr[sockets.size % colorArr.length],
-      });
-    }
-    
+  console.log("player: ", gameState.player);
+  if (sockets.size > 2) {
+    serverGameState.player.push({
+      posX: 480,
+      posY: 540,
+      velX: Math.random() * 50 - 25,
+      velY: 0,
+      id: socketCounter,
+      ping: 0,
+      name: "Mr.Smith",
+      color: colorArr[sockets.size % colorArr.length],
+    });
+  }
+
   socket.onopen = () => {
     console.log(`we found player${socketCounter}`);
     const paket = {
@@ -71,17 +75,29 @@ function handleSocket(socket: WebSocket) {
   };
   socket.onmessage = (event) => {
     const paket = JSON.parse(event.data);
-    if(debug) console.log("Received message: ", paket);
-    if(paket.type == "move") serverGameState.player[paket.id].velX = paket.velX
-    if(paket.type == "ping"){
-      if(paket.pong) {
-        const timePing = performance.now() - paket.time ;
+    // #region ParseMessage
+    if (debug) console.log("Received message: ", paket);
+    if (paket.type === "changeName")
+      serverGameState.player[paket.id].name = paket.name;
+    if (paket.type == "moveL")
+      serverGameState.player[paket.id].velX = -serverGameState.movementSpeed;
+    if (paket.type == "moveR")
+      serverGameState.player[paket.id].velX = serverGameState.movementSpeed;
+    if (paket.type == "dashL")
+      serverGameState.player[paket.id].velX = -serverGameState.dashSpeed;
+    if (paket.type == "dashR")
+      serverGameState.player[paket.id].velX = serverGameState.dashSpeed;
+
+    if (paket.type == "ping") {
+      if (paket.pong) {
+        const timePing = performance.now() - paket.time;
         serverGameState.player[paket.id].ping = Math.floor(timePing);
       }
-    } 
-    if(paket.type == "reload"){
-      serverGameState = initGameState()
     }
+    if (paket.type == "reload") {
+      serverGameState = initGameState();
+    }
+    // #endregion
   };
 
   socket.onclose = () => {
@@ -113,12 +129,11 @@ function broadcast() {
           pong: false,
           time: performance.now(),
         };
-        socket.send(JSON.stringify(pingPaket))
+        socket.send(JSON.stringify(pingPaket));
       }
     }
   }
 }
-
 
 // gameLoop
 
@@ -127,17 +142,17 @@ let intervalId: number;
 function startGame() {
   intervalId = setInterval(() => {
     serverGameState.tick++;
-    runPhysics(serverGameState)
-    broadcast()
-  }, 1000 / 90); 
+    runPhysics(serverGameState);
+    broadcast();
+  }, 1000 / 90);
 
   setTimeout(() => {
     clearInterval(intervalId);
     console.log("Gameloop is over.");
-  }, 1000000); 
+  }, 1000000);
 }
 
-startGame()
+startGame();
 
 // let lastTime = performance.now();
 
@@ -156,7 +171,3 @@ startGame()
 // }
 
 // setTimeout(serverAnimationLoop, 0);
-
-
-
-
