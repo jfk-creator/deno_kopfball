@@ -40,8 +40,8 @@ function setup() {
         playerHeight: 64,
         playerOffset: 20,
         movementSpeed: 5,
-        jumpSpeed: -1,
-        dashSpeed: 0,
+        jumpSpeed: -3,
+        dashSpeed: 15,
         resistance: 0.8999,
         gravity: 0.1,
         hitForce: 1.2,
@@ -60,8 +60,8 @@ function setup() {
         playerHeight: 64,
         playerOffset: 20,
         movementSpeed: 5,
-        jumpSpeed: -1,
-        dashSpeed: 0,
+        jumpSpeed: -3,
+        dashSpeed: 15,
         resistance: 0.8999,
         gravity: 0.1,
         hitForce: 1.2,
@@ -86,8 +86,8 @@ function draw() {
   if (importedModule && gameState.player.length > 0) {
     switch (gameState.game.level) {
       case 1:
-        // if (gameState.game.score <= gameState.levels.level1.win) {
-        if (false) {
+        if (gameState.game.score <= gameState.levels.level1.win) {
+          // if (false) {
           level1();
         } else {
           shop1();
@@ -99,8 +99,24 @@ function draw() {
         } else {
           shop1();
         }
+        break;
+      case 3:
+        if (gameState.game.score <= gameState.levels.level2.win) {
+          level1();
+        } else {
+          shop1();
+        }
+        break;
+      case 4:
+        if (gameState.game.score <= gameState.levels.level2.win) {
+          level1();
+        } else {
+          shop1();
+        }
+        break;
 
       default:
+        background(70);
         console.error("no level selected");
         break;
     }
@@ -151,7 +167,10 @@ function drawText() {
   textSize(20);
   textFont("Urbanist");
   textAlign(LEFT);
-  text("You need: " + gameState.levels.level1.win, 12, offset);
+  if (gameState.game.level === 1)
+    text("You need: " + gameState.levels.level1.win, 12, offset);
+  if (gameState.game.level === 2)
+    text("You need: " + gameState.levels.level2.win, 12, offset);
   textAlign(RIGHT);
   text(
     "Highscore: " + gameState.game.highscore,

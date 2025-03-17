@@ -27,6 +27,13 @@ let shopCounter = 200;
 let shopPos = 0;
 let newShopPos = false;
 
+function resetShop() {
+  fadeCounter = 255;
+  shopCounter = 200;
+  shopPos = 0;
+  newShopPos = false;
+}
+
 function shop1(current) {
   noStroke();
   if (fadeCounter <= 255) {
@@ -37,18 +44,26 @@ function shop1(current) {
   } else {
     background(20);
     if (shopCounter > 0) {
-      if (gameState.player[0].posX <= gameState.props.width / 3) {
+      if (
+        gameState.player[0].posX <= gameState.props.width / 3 &&
+        gameState.player[1].posX <= gameState.props.width / 3
+      ) {
         if (shopPos != 1) shopCounter = 200;
         shopCounter--;
         shopPos = 1;
       } else if (
         gameState.player[0].posX >= gameState.props.width / 3 &&
-        gameState.player[0].posX <= (2 * gameState.props.width) / 3
+        gameState.player[0].posX <= (2 * gameState.props.width) / 3 &&
+        gameState.player[1].posX >= gameState.props.width / 3 &&
+        gameState.player[1].posX <= (2 * gameState.props.width) / 3
       ) {
         if (shopPos != 2) shopCounter = 200;
         shopCounter--;
         shopPos = 2;
-      } else if (gameState.player[0].posX >= (2 * gameState.props.width) / 3) {
+      } else if (
+        gameState.player[0].posX >= (2 * gameState.props.width) / 3 &&
+        gameState.player[1].posX >= (2 * gameState.props.width) / 3
+      ) {
         if (shopPos != 3) shopCounter = 200;
         shopCounter--;
         shopPos = 3;
@@ -100,20 +115,27 @@ function shop1(current) {
       switch (shopPos) {
         case 1:
           gameState.player[0].jumpSpeed -= 2;
+          gameState.player[1].jumpSpeed -= 2;
           break;
         case 2:
           gameState.player[0].dashSpeed += 10;
+          gameState.player[1].dashSpeed += 10;
           break;
         case 3:
           gameState.player[0].hitForce += 0.02;
+          gameState.player[1].dashSpeed += 10;
           break;
       }
       gameState.ball = importedModule.resetBall();
       gameState.game.level++;
+      gameState.game.score = 0;
+      resetShop();
     }
 
     keyInput();
     gameState = importedModule.runPhysics(gameState);
+    gameState.ball = importedModule.resetBall();
     drawPlayer(gameState.player[0]);
+    drawPlayer(gameState.player[1]);
   }
 }

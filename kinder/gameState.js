@@ -21,10 +21,10 @@ export function initGameState() {
     scenes: {},
     levels: {
       level1: {
-        win: 10,
+        win: 10000,
       },
       level2: {
-        win: 50000,
+        win: 10000,
       },
     },
     player: [
