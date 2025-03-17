@@ -1,9 +1,4 @@
-import {
-  runPhysics,
-  gameState,
-  initGameState,
-  resetBall,
-} from "../kinder/gameState.js";
+import { runPhysics, gameState, resetBall } from "../kinder/gameState.js";
 
 const debug = false;
 // const sockets = new Set<WebSocket>();
@@ -17,7 +12,7 @@ const colorArr = [
   "#F10047", // Vivid Red-Orange
 ];
 let onStartUp = true;
-let serverGameState = gameState;
+const serverGameState = gameState;
 let socketCounter = 0;
 
 interface pingPakete {
