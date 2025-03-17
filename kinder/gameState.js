@@ -6,10 +6,12 @@ export function initGameState() {
       frameRate: 90,
       width: 960,
       height: 540,
+      offset: 20,
     },
     game: {
       tick: 0,
       ids: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      level: 1,
       playerCount: 1,
       highscore: 0,
       score: 0,
@@ -19,7 +21,7 @@ export function initGameState() {
     scenes: {},
     levels: {
       level1: {
-        win: 10000,
+        win: 10,
       },
       level2: {
         win: 50000,

@@ -21,3 +21,99 @@ function level1() {
     }
   }
 }
+
+let fadeCounter = 255;
+let shopCounter = 200;
+let shopPos = 0;
+let newShopPos = false;
+
+function shop1(current) {
+  noStroke();
+  if (fadeCounter <= 255) {
+    fadeCounter += fadeCounter / 20;
+    level1();
+    fill(0, 0, 0, fadeCounter);
+    rect(0, 0, gameState.props.width, gameState.props.height);
+  } else {
+    background(20);
+    if (shopCounter > 0) {
+      if (gameState.player[0].posX <= gameState.props.width / 3) {
+        if (shopPos != 1) shopCounter = 200;
+        shopCounter--;
+        shopPos = 1;
+      } else if (
+        gameState.player[0].posX >= gameState.props.width / 3 &&
+        gameState.player[0].posX <= (2 * gameState.props.width) / 3
+      ) {
+        if (shopPos != 2) shopCounter = 200;
+        shopCounter--;
+        shopPos = 2;
+      } else if (gameState.player[0].posX >= (2 * gameState.props.width) / 3) {
+        if (shopPos != 3) shopCounter = 200;
+        shopCounter--;
+        shopPos = 3;
+      }
+
+      switch (shopPos) {
+        case 1:
+          fill(shopCounter, 0, 0);
+          rect(
+            0,
+            0,
+            gameState.props.width / 3,
+            gameState.props.height - gameState.props.offset
+          );
+          fill(255);
+          textSize(32);
+          textAlign(CENTER);
+          text("Jump++", gameState.props.width / 6, 150);
+          break;
+        case 2:
+          fill(0, shopCounter, 0);
+          rect(
+            gameState.props.width / 3,
+            0,
+            gameState.props.width / 3,
+            gameState.props.height - gameState.props.offset
+          );
+          fill(255);
+          textSize(32);
+          textAlign(CENTER);
+          text("Dash++", gameState.props.width / 2, 150);
+          break;
+        case 3:
+          fill(0, 0, shopCounter);
+          rect(
+            (2 * gameState.props.width) / 3,
+            0,
+            gameState.props.width / 3,
+            gameState.props.height - gameState.props.offset
+          );
+          fill(255);
+          textSize(32);
+          textAlign(CENTER);
+          text("Hit++", (gameState.props.width * 5) / 6, 150);
+        default:
+          break;
+      }
+    } else {
+      switch (shopPos) {
+        case 1:
+          gameState.player[0].jumpSpeed -= 2;
+          break;
+        case 2:
+          gameState.player[0].dashSpeed += 10;
+          break;
+        case 3:
+          gameState.player[0].hitForce += 0.02;
+          break;
+      }
+      gameState.ball = importedModule.resetBall();
+      gameState.game.level++;
+    }
+
+    keyInput();
+    gameState = importedModule.runPhysics(gameState);
+    drawPlayer(gameState.player[0]);
+  }
+}
