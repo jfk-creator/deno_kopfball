@@ -84,27 +84,7 @@ function setup() {
 
 function draw() {
   if (importedModule && gameState.player.length > 0) {
-    background(20);
-    drawNextPlayerCircle();
-    drawText();
-    for (let i = 0, k = 0; i < gameState.game.ids.length; i++) {
-      if (gameState.game.ids[i] === 1) {
-        let player = gameState.player[k++];
-        drawPlayer(player);
-      }
-    }
-    drawBall(gameState.ball);
-
-    keyInput();
-    gameState = importedModule.runPhysics(gameState);
-
-    if (frameCount % 10 == 0) {
-      playerInfo.innerHTML = "";
-      for (let i = 0; i < gameState.player.length; i++) {
-        let player = gameState.player[i];
-        playerInfo.innerHTML += `<span style="color: ${player.color}">${player.id}. ${player.name}: ${player.ping}</span></br>`;
-      }
-    }
+    level1();
   }
 }
 // #region DrawPlayer
@@ -151,6 +131,8 @@ function drawText() {
   fill("#E5F0F4");
   textSize(20);
   textFont("Urbanist");
+  textAlign(LEFT);
+  text("You need: " + gameState.levels.level1.win, 12, offset);
   textAlign(RIGHT);
   text(
     "Highscore: " + gameState.game.highscore,

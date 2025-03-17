@@ -16,6 +16,15 @@ export function initGameState() {
       hits: 0,
       nextPlayer: 0,
     },
+    scenes: {},
+    levels: {
+      level1: {
+        win: 10000,
+      },
+      level2: {
+        win: 50000,
+      },
+    },
     player: [
       {
         posX: 480,
