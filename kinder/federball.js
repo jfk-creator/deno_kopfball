@@ -228,9 +228,6 @@ function keyInput() {
     if (keyIsDown(RIGHT_ARROW) && keyIsDown(SHIFT)) {
       gameState.player[1].velX = gameState.player[1].dashSpeed;
     }
-    if (keyIsDown(20)) {
-      debug = !debug;
-    }
     // r
     if (keyIsDown(82) && keyIsDown(CONTROL)) {
       gameState = initGameState();
@@ -318,6 +315,9 @@ function keyInput() {
 
 // #region jumping
 function keyPressed() {
+  if (keyIsDown(20)) {
+    debug = !debug;
+  }
   if (id === -1) {
     if (keyCode === 87 && Date.now() - gameState.player[0].jumpCooldown > 600) {
       gameState.player[0].jumpCooldown = Date.now();
