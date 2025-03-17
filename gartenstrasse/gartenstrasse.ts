@@ -36,12 +36,21 @@ interface player {
   ping: number;
   name: string;
   color: string;
+  playerWidth: number;
+  playerHeight: number;
+  playerOffset: number;
+  movementSpeed: number;
+  jumpSpeed: number;
+  dashSpeed: number;
+  resistance: number;
+  gravity: number;
+  hitForce: number;
   jumpCooldown: number;
 }
 
 function saId(): number {
-  for (let i = 0; i < serverGameState.ids.length; i++) {
-    if (serverGameState.ids[i] === 0) {
+  for (let i = 0; i < serverGameState.game.ids.length; i++) {
+    if (serverGameState.game.ids[i] === 0) {
       return i;
     }
   }
@@ -95,11 +104,11 @@ function printPlayer(players: player[]) {
 
 function handleSocket(socket: WebSocket) {
   const key = saId();
-  serverGameState.ids[saId()] = 1;
-  if (debug) console.log(serverGameState.ids);
+  serverGameState.game.ids[saId()] = 1;
+  if (debug) console.log(serverGameState.game.ids);
   sockets.set(key, socket);
   serverGameState.ball = resetBall();
-  serverGameState.playerCount = sockets.size;
+  serverGameState.game.playerCount = sockets.size;
   serverGameState.player.push({
     posX: 480,
     posY: 540,
@@ -107,8 +116,17 @@ function handleSocket(socket: WebSocket) {
     velY: 0,
     id: key,
     ping: 0,
-    name: "Mr.Smith",
-    color: colorArr[key % colorArr.length],
+    name: "Hans",
+    color: colorArr[key % 5],
+    playerWidth: 64,
+    playerHeight: 64,
+    playerOffset: 20,
+    movementSpeed: 5,
+    jumpSpeed: -3,
+    dashSpeed: 15,
+    resistance: 0.8999,
+    gravity: 0.1,
+    hitForce: 1.2,
     jumpCooldown: 0,
   });
 
@@ -140,13 +158,17 @@ function handleSocket(socket: WebSocket) {
       printPlayer(gameState.player);
     }
     if (paket.type == "moveL")
-      serverGameState.player[playerId].velX = -serverGameState.movementSpeed;
+      serverGameState.player[playerId].velX =
+        -serverGameState.player[playerId].movementSpeed;
     if (paket.type == "moveR")
-      serverGameState.player[playerId].velX = serverGameState.movementSpeed;
+      serverGameState.player[playerId].velX =
+        serverGameState.player[playerId].movementSpeed;
     if (paket.type == "dashL")
-      serverGameState.player[playerId].velX = -serverGameState.dashSpeed;
+      serverGameState.player[playerId].velX =
+        -serverGameState.player[playerId].dashSpeed;
     if (paket.type == "dashR")
-      serverGameState.player[playerId].velX = serverGameState.dashSpeed;
+      serverGameState.player[playerId].velX =
+        serverGameState.player[playerId].dashSpeed;
     if (paket.type == "jump") {
       console.log(
         performance.now() - serverGameState.player[playerId].jumpCooldown
@@ -155,7 +177,8 @@ function handleSocket(socket: WebSocket) {
         performance.now() - serverGameState.player[playerId].jumpCooldown >
         500
       ) {
-        serverGameState.player[playerId].velY = serverGameState.jumpSpeed;
+        serverGameState.player[playerId].velY =
+          serverGameState.player[playerId].jumpSpeed;
         serverGameState.player[playerId].jumpCooldown = performance.now();
       }
     }
@@ -179,10 +202,10 @@ function handleSocket(socket: WebSocket) {
     serverGameState.player = deletePlayer(serverGameState.player, key);
     console.log(serverGameState.player);
     socketCounter--;
-    serverGameState.ids[key] = 0;
+    serverGameState.game.ids[key] = 0;
     if (serverGameState.player.length != 0)
-      serverGameState.nextPlayer = serverGameState.player[0].id;
-    console.log(serverGameState.ids);
+      serverGameState.game.nextPlayer = serverGameState.player[0].id;
+    console.log(serverGameState.game.ids);
     // serverGameState = initGameState();
   };
 
@@ -202,7 +225,7 @@ function broadcast() {
         gs: serverGameState,
       };
       socket.send(JSON.stringify(paket));
-      if (serverGameState.tick % serverGameState.frameRate == 0) {
+      if (serverGameState.game.tick % serverGameState.props.frameRate == 0) {
         const pingPaket = {
           type: "ping",
           id: -1,
@@ -229,7 +252,7 @@ let intervalId: number;
 
 function startGame() {
   intervalId = setInterval(() => {
-    serverGameState.tick++;
+    serverGameState.game.tick++;
     runPhysics(serverGameState);
     broadcast();
   }, 1000 / 90);
