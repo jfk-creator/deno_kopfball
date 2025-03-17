@@ -3,6 +3,18 @@ let gameState;
 let initGameState;
 let runPhysics;
 let playerInfo;
+
+function preload() {
+  sprites = [
+    loadImage("./assets/chonki_yellow.png"),
+    loadImage("./assets/chonki_orange.png"),
+    loadImage("./assets/chonki_blue.png"),
+    loadImage("./assets/chonki_green.png"),
+    loadImage("./assets/chonki_red.png"),
+  ];
+  ballSprite = loadImage("./assets/balli.png");
+}
+
 function setup() {
   playerInfo = document.getElementById("players");
   import("./gameState.js").then((module) => {
@@ -12,8 +24,8 @@ function setup() {
     initGameState = importedModule.initGameState;
     runPhysics = importedModule.runPhysics;
     frameRate(gameState.frameRate);
+    gameState.player = [];
     if (!connectionInitialized) {
-      gameState.player = [];
       gameState.player.push({
         posX: 480,
         posY: 540,
@@ -22,7 +34,7 @@ function setup() {
         id: 0,
         ping: 0,
         name: "Hans",
-        color: "#FF757F",
+        color: "#FFA905",
         jumpCooldown: 0,
       });
       gameState.player.push({
@@ -33,7 +45,7 @@ function setup() {
         id: 1,
         ping: 0,
         name: "Laura",
-        color: "#9ECE6A",
+        color: "#FF5400",
         jumpCooldown: 0,
       });
     }
@@ -52,7 +64,7 @@ function setup() {
 }
 
 function draw() {
-  if (importedModule) {
+  if (importedModule && gameState.player.length > 0) {
     background(20);
     drawNextPlayerCircle();
     drawText();
@@ -71,20 +83,19 @@ function draw() {
       playerInfo.innerHTML = "";
       for (let i = 0; i < gameState.player.length; i++) {
         let player = gameState.player[i];
-        playerInfo.innerHTML += `<span style="color: ${player.color}">${player.name}: ${player.ping}</span></br>`;
+        playerInfo.innerHTML += `<span style="color: ${player.color}">${player.id}. ${player.name}: ${player.ping}</span></br>`;
       }
     }
   }
 }
 // #region DrawPlayer
 function drawPlayer(player) {
-  fill(player.color);
-  rect(
+  image(
+    sprites[player.id % 5],
     player.posX,
-    player.posY - gameState.playerHeight - gameState.playerOffset,
-    gameState.playerWidth,
-    gameState.playerHeight
+    player.posY - gameState.playerHeight - gameState.playerOffset
   );
+
   textSize(16);
   textAlign(CENTER);
   text(
@@ -113,13 +124,8 @@ function drawText() {
 
 function drawNextPlayerCircle() {
   let playerId = getPlayerId(gameState.player, gameState.nextPlayer);
-  while (playerId === -1) {
-    gameState.nextPlayer = getNextPlayerId(
-      gameState.player,
-      gameState.playerId
-    );
-    console.log("nextPlayer: ", gameState.nextPlayer);
-    playerId = getPlayerId(gameState.player, gameState.nextPlayer);
+  if (playerId === -1) {
+    console.error("drawCircle, couln't find player");
   }
   fill(gameState.player[playerId].color);
   circle(width / 2, 50, 50);
@@ -128,7 +134,7 @@ function drawNextPlayerCircle() {
 function getPlayerId(players, key) {
   for (let i = 0; i < players.length; i++) {
     if (players[i].id === key) {
-      // if (debug) console.log(`found id: ${players[i].id} as: ${i}`);
+      // console.log(`found id: ${players[i].id} as: ${i}`);
       return i;
     }
   }
@@ -142,6 +148,15 @@ function getNextPlayerId(players, key) {
       else return players[0].id;
     }
   }
+}
+
+function saId() {
+  for (let i = 0; i < gameState.ids.length; i++) {
+    if (gameState.ids[i] === 0) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 // #region keyInput

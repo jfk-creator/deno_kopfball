@@ -13,7 +13,7 @@ export let gameState = {
   hitForce: 1.2,
   gravity: 0.1,
   airDrag: 0.995,
-  ballR: 5,
+  ballR: 8,
   tick: 0,
   hits: 0,
   score: 0,
@@ -57,7 +57,7 @@ export function initGameState() {
     hitForce: 0.5,
     gravity: 0.1,
     airDrag: 0.995,
-    ballR: 5,
+    ballR: 8,
     tick: 0,
     hits: 0,
     score: 0,
@@ -149,12 +149,12 @@ function moveBall({ posX, posY, velX, velY }) {
   if (posX > gameState.width - gameState.ballR) velX *= -1;
   return { posX, posY, velX, velY };
 }
-
+// #region ballPhysics
 function ballPhysics({ posX, posY, velX, velY }) {
   velY += gameState.gravity;
   velY *= gameState.airDrag;
   velX *= gameState.airDrag;
-  if (posY > gameState.height) {
+  if (posY > gameState.height - gameState.ballR) {
     velY *= -0.999;
     gameState.hits = 0;
     gameState.score = 0;
@@ -177,8 +177,16 @@ function kopfball(player, ball) {
     ball.posX - player.posX > -3 &&
     ball.velY > 0 &&
     ball.posY <
-      player.posY - gameState.playerHeight - gameState.playerOffset + 15 &&
-    ball.posY > player.posY - gameState.playerHeight - gameState.playerOffset
+      player.posY -
+        gameState.playerHeight -
+        gameState.playerOffset +
+        15 -
+        gameState.ballR &&
+    ball.posY >
+      player.posY -
+        gameState.playerHeight -
+        gameState.playerOffset -
+        gameState.ballR
   ) {
     if (player.id == gameState.nextPlayer) {
       gameState.hits++;
@@ -213,6 +221,7 @@ function getNextPlayerId(players, key) {
     }
   }
 }
+
 // gameLoop
 
 // let intervalId;

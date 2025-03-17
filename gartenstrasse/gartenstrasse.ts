@@ -8,22 +8,13 @@ import {
 const debug = false;
 // const sockets = new Set<WebSocket>();
 const sockets = new Map<number, WebSocket>();
-const maxConnection = 10;
+const maxConnection = 5;
 const colorArr = [
-  "#FF757F", // Tokyo Red
-  "#EFB662", // Tokyo Gold
-  "#7DCFFF", // Tokyo Skyblue
-  "#7AA2F7", // Tokyo Blue
-  "#FF5733", // Vivid Red-Orange
-  "#33FF57", // Bright Lime Green
-  "#5733FF", // Deep Purple
-  "#FF33E6", // Magenta-Pink
-  "#33E6FF", // Cyan-Blue
-  "#E6FF33", // Yellow-Green
-  "#FF9933", // Amber-Orange
-  "#3399FF", // Light Blue
-  "#9933FF", // Violet
-  "#FF3399", // Rose-Pink
+  "#FFA905", // Tokyo Red
+  "#FF5400", // Tokyo Gold
+  "#1ED1FF", // Tokyo Skyblue
+  "#9DED00", // Tokyo Blue
+  "#F10047", // Vivid Red-Orange
 ];
 let onStartUp = true;
 let serverGameState = gameState;
@@ -70,6 +61,7 @@ function getPlayerId(players: player[], key: number) {
 function deletePlayer(players: player[], key: number) {
   for (let i = 0; i < players.length; i++) {
     if (players[i].id === key) {
+      players.splice(i, 1);
       console.log("Good bye player:", key);
       return players;
     }
@@ -141,7 +133,7 @@ function handleSocket(socket: WebSocket) {
     if (debug) console.log("Received message: ", paket);
     if (paket.type === "changeName") {
       console.log(
-        `%c${serverGameState.player[playerId].name}changed his name to: ${paket.name}`,
+        `%c${serverGameState.player[playerId].name} changed his name to: ${paket.name}`,
         "color: orange; font-weight: bold;"
       );
       serverGameState.player[playerId].name = paket.name;
@@ -175,7 +167,7 @@ function handleSocket(socket: WebSocket) {
       }
     }
     if (paket.type == "reload") {
-      serverGameState = initGameState();
+      serverGameState.ball = resetBall();
     }
     // #endregion
   };
