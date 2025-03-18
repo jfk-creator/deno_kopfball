@@ -1,11 +1,105 @@
 import p5 from "p5";
-import { socket, id } from "./kind.ts";
 import { gameState as gs, resetBall, runPhysics } from "./gameState.ts";
 
-let importedModule;
+// #region client
+
+let socket: WebSocket;
+let server_addr = "ws://192.168.178.22:420";
+let info = document.getElementById("info");
+let nameVal = document.getElementById("name") as HTMLInputElement;
+let sendNameButton = document.getElementById("sendName");
+let id = -1;
+let maxConnection = 5;
+let connectionInitialized = false;
+
+export function connectWebSocket() {
+  socket = new WebSocket(server_addr);
+  socket.addEventListener("open", () => {
+    console.log("connected to server");
+    if (info) info.innerHTML += `</br>connected to server </br>`;
+  });
+  handleConnection(socket);
+}
+
+function handleConnection(socket) {
+  socket.addEventListener("message", (event) => {
+    let paket = JSON.parse(event.data);
+    if (paket.type == "init" && !connectionInitialized) {
+      id = paket.id;
+      if (info) info.innerHTML += `Hallo Freund ${id + 1}</br>`;
+      connectionInitialized = true;
+      if (id > maxConnection) {
+        if (info) info.innerHTML += "closing Connection.</br>";
+        socket.close();
+        connectionInitialized = false;
+      } else {
+        const playerName = localStorage.getItem("playerName");
+        if (playerName) {
+          const paket = {
+            type: "changeName",
+            id: id,
+            name: playerName,
+          };
+          socket.send(JSON.stringify(paket));
+        }
+      }
+    }
+    if (connectionInitialized) {
+      if (paket.type == "gameState") {
+        gameState = paket.gs;
+      }
+      if (paket.type == "ping") {
+        if (!paket.pong) {
+          paket.pong = true;
+          paket.id = id;
+          socket.send(JSON.stringify(paket));
+        }
+      }
+    }
+  });
+  socket.addEventListener("close", () => {
+    console.log("disconnected from server");
+    if (info) info.innerHTML += `disconnected from server </br>`;
+  });
+}
+
+if (sendNameButton)
+  sendNameButton.addEventListener("click", function () {
+    if (nameVal) gameState.player[0].name = nameVal.value;
+    nameVal.blur();
+    localStorage.setItem("playerName", nameVal.value);
+    if (socket.readyState === WebSocket.OPEN) {
+      const paket = {
+        type: "changeName",
+        id: id,
+        name: nameVal.value,
+      };
+      socket.send(JSON.stringify(paket));
+    }
+  });
+
+nameVal.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    nameVal.blur();
+    localStorage.setItem("playerName", nameVal.value);
+    gameState.player[0].name = nameVal.value;
+    if (socket.readyState === WebSocket.OPEN) {
+      const paket = {
+        type: "changeName",
+        id: id,
+        name: nameVal.value,
+      };
+      socket.send(JSON.stringify(paket));
+    }
+  }
+});
+connectWebSocket();
+
+// #region p5
+
 let gameState = gs;
 let initGameState;
-let playerInfo;
+let playerInfo = document.getElementById("playerInfo");
 let debug = false;
 let sprites;
 let ballSprite;
@@ -24,117 +118,60 @@ const sketch = (p: p5) => {
 
   p.setup = () => {
     playerInfo = document.getElementById("players");
-    //   import("./gameState.js").then((module) => {
-    //     importedModule = module;
 
-    //     gameState = importedModule.gameState;
-    //     initGameState = importedModule.initGameState;
-    //     runPhysics = importedModule.runPhysics;
-    //     frameRate(gameState.props.frameRate);
-    //     gameState.player = [];
-    //     if (!connectionInitialized) {
-    //       gameState.player.push({
-    //         posX: 480,
-    //         posY: 540,
-    //         velX: Math.random() * 50 - 25,
-    //         velY: 0,
-    //         id: 0,
-    //         ping: 0,
-    //         name: "Hans",
-    //         color: "#FFA905",
-    //         playerWidth: 64,
-    //         playerHeight: 64,
-    //         playerOffset: 20,
-    //         movementSpeed: 5,
-    //         jumpSpeed: -3,
-    //         dashSpeed: 15,
-    //         resistance: 0.8999,
-    //         gravity: 0.1,
-    //         hitForce: 1.2,
-    //         jumpCooldown: 0,
-    //       });
-    //       gameState.player.push({
-    //         posX: 480,
-    //         posY: 540,
-    //         velX: Math.random() * 50 - 25,
-    //         velY: 0,
-    //         id: 1,
-    //         ping: 0,
-    //         name: "Laura",
-    //         color: "#FF5400",
-    //         playerWidth: 64,
-    //         playerHeight: 64,
-    //         playerOffset: 20,
-    //         movementSpeed: 5,
-    //         jumpSpeed: -3,
-    //         dashSpeed: 15,
-    //         resistance: 0.8999,
-    //         gravity: 0.1,
-    //         hitForce: 1.2,
-    //         jumpCooldown: 0,
-    //       });
-    //     }
-    //     gameState.game.ids[0] = 1;
-    //     gameState.game.ids[1] = 1;
-    //     const playerName = localStorage.getItem("playerName");
-    //     const localHighscore = localStorage.getItem("highscore");
-    //     if (playerName) {
-    //       gameState.player[0].name = playerName;
-    //     }
-    //     if (localHighscore) gameState.game.highscore = localHighscore;
-    //   });
-
-    gameState.player = [];
-    if (true) {
-      gameState.player.push({
-        posX: 480,
-        posY: 540,
-        velX: Math.random() * 50 - 25,
-        velY: 0,
-        id: 0,
-        ping: 0,
-        name: "Hans",
-        color: "#FFA905",
-        playerWidth: 64,
-        playerHeight: 64,
-        playerOffset: 20,
-        movementSpeed: 5,
-        jumpSpeed: -3,
-        dashSpeed: 15,
-        resistance: 0.8999,
-        gravity: 0.1,
-        hitForce: 1.2,
-        jumpCooldown: 0,
-      });
-      gameState.player.push({
-        posX: 480,
-        posY: 540,
-        velX: Math.random() * 50 - 25,
-        velY: 0,
-        id: 1,
-        ping: 0,
-        name: "Laura",
-        color: "#FF5400",
-        playerWidth: 64,
-        playerHeight: 64,
-        playerOffset: 20,
-        movementSpeed: 5,
-        jumpSpeed: -3,
-        dashSpeed: 15,
-        resistance: 0.8999,
-        gravity: 0.1,
-        hitForce: 1.2,
-        jumpCooldown: 0,
-      });
+    if (!connectionInitialized) {
+      gameState.player = [];
+      if (true) {
+        gameState.player.push({
+          posX: 480,
+          posY: 540,
+          velX: Math.random() * 50 - 25,
+          velY: 0,
+          id: 0,
+          ping: 0,
+          name: "Hans",
+          color: "#FFA905",
+          playerWidth: 64,
+          playerHeight: 64,
+          playerOffset: 20,
+          movementSpeed: 5,
+          jumpSpeed: -3,
+          dashSpeed: 15,
+          resistance: 0.8999,
+          gravity: 0.1,
+          hitForce: 1.2,
+          jumpCooldown: 0,
+        });
+        gameState.player.push({
+          posX: 480,
+          posY: 540,
+          velX: Math.random() * 50 - 25,
+          velY: 0,
+          id: 1,
+          ping: 0,
+          name: "Laura",
+          color: "#FF5400",
+          playerWidth: 64,
+          playerHeight: 64,
+          playerOffset: 20,
+          movementSpeed: 5,
+          jumpSpeed: -3,
+          dashSpeed: 15,
+          resistance: 0.8999,
+          gravity: 0.1,
+          hitForce: 1.2,
+          jumpCooldown: 0,
+        });
+      }
+      gameState.game.ids[0] = 1;
+      gameState.game.ids[1] = 1;
+      const playerName = localStorage.getItem("playerName");
+      const localHighscore = localStorage.getItem("highscore");
+      if (playerName) {
+        gameState.player[0].name = playerName;
+      }
+      if (localHighscore) gameState.game.highscore = localHighscore;
     }
-    gameState.game.ids[0] = 1;
-    gameState.game.ids[1] = 1;
-    const playerName = localStorage.getItem("playerName");
-    const localHighscore = localStorage.getItem("highscore");
-    if (playerName) {
-      gameState.player[0].name = playerName;
-    }
-    if (localHighscore) gameState.game.highscore = localHighscore;
 
     let canvas = p.createCanvas(960, 540);
     canvas.parent("theater");
@@ -177,6 +214,13 @@ const sketch = (p: p5) => {
           p.background(70);
           console.error("no level selected");
           break;
+      }
+    }
+
+    if (p.frameCount % 10 == 0 && playerInfo) {
+      playerInfo.innerHTML = "";
+      for (const player of gameState.player) {
+        playerInfo.innerHTML += `${player.name}: ${player.ping}<br/>`;
       }
     }
   };
@@ -433,6 +477,7 @@ const sketch = (p: p5) => {
     }
   };
 
+  // #region levels
   function level1() {
     p.background(20);
     drawNextPlayerCircle();
@@ -469,6 +514,7 @@ const sketch = (p: p5) => {
     newShopPos = false;
   }
 
+  // #region shop
   function shop1() {
     p.noStroke();
     if (fadeCounter <= 255) {

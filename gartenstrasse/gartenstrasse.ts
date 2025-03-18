@@ -1,4 +1,4 @@
-import { runPhysics, gameState, resetBall } from "../kinder/gameState.js";
+import { runPhysics, gameState, resetBall } from "../kinder/gameState.ts";
 
 const debug = false;
 // const sockets = new Set<WebSocket>();
