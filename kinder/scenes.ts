@@ -1,14 +1,5 @@
-import {
-  drawPlayer,
-  keyInput,
-  drawBall,
-  drawText,
-  drawNextPlayerCircle,
-} from "./main";
-import { gameState as gs, runPhysics } from "./gameState";
-
 let gameState = gs;
-export function level1() {
+function level1() {
   background(20);
   drawNextPlayerCircle();
   drawText();
@@ -24,10 +15,10 @@ export function level1() {
   gameState = runPhysics(gameState);
 
   if (frameCount % 10 == 0) {
-    playerInfo.innerHTML = "";
+    // playerInfo.innerHTML = "";
     for (let i = 0; i < gameState.player.length; i++) {
       let player = gameState.player[i];
-      playerInfo.innerHTML += `<span style="color: ${player.color}">${player.id}. ${player.name}: ${player.ping}</span></br>`;
+      //   playerInfo.innerHTML += `<span style="color: ${player.color}">${player.id}. ${player.name}: ${player.ping}</span></br>`;
     }
   }
 }
@@ -44,7 +35,7 @@ function resetShop() {
   newShopPos = false;
 }
 
-export function shop1() {
+function shop1() {
   noStroke();
   if (fadeCounter <= 255) {
     fadeCounter += fadeCounter / 20;
@@ -136,15 +127,15 @@ export function shop1() {
           gameState.player[1].dashSpeed += 10;
           break;
       }
-      gameState.ball = importedModule.resetBall();
+      gameState.ball = resetBall();
       gameState.game.level++;
       gameState.game.score = 0;
       resetShop();
     }
 
     keyInput();
-    gameState = importedModule.runPhysics(gameState);
-    gameState.ball = importedModule.resetBall();
+    gameState = runPhysics(gameState);
+    gameState.ball = resetBall();
     drawPlayer(gameState.player[0]);
     drawPlayer(gameState.player[1]);
   }

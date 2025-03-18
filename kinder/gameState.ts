@@ -126,7 +126,7 @@ function moveBall(ball) {
   return ball;
 }
 // #region ballPhysics
-function ballPhysics(ball) {
+export function ballPhysics(ball) {
   ball.velY += ball.gravity;
   ball.velY *= ball.airDrag;
   ball.velX *= ball.airDrag;
