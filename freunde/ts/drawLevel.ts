@@ -1,5 +1,5 @@
 import p5 from "p5";
-import { game, levelWins, Player, props } from "./gameState";
+import { game, levelWins, Player, props } from "./types";
 import { sprites } from "./game";
 import { clientData } from "./kopfball";
 

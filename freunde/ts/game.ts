@@ -1,6 +1,6 @@
 import p5 from "p5";
 import { htmlObjects } from "./kopfball";
-import { game, props } from "./gameState";
+import { game, props } from "./types";
 import { keyInput } from "./keyInput";
 import { drawLevel } from "./drawLevel";
 
