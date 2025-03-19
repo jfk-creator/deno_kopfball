@@ -1,6 +1,6 @@
 import { runPhysics, gameState, resetBall } from "../kinder/gameState.ts";
 
-const debug = false;
+const debug = true;
 // const sockets = new Set<WebSocket>();
 const sockets = new Map<number, WebSocket>();
 const maxConnection = 5;
@@ -30,6 +30,7 @@ interface player {
   id: number;
   ping: number;
   name: string;
+  location: string;
   color: string;
   playerWidth: number;
   playerHeight: number;
@@ -112,6 +113,7 @@ function handleSocket(socket: WebSocket) {
     id: key,
     ping: 0,
     name: "Hans",
+    location: "level",
     color: colorArr[key % 5],
     playerWidth: 64,
     playerHeight: 64,
@@ -183,6 +185,15 @@ function handleSocket(socket: WebSocket) {
         const timePing = performance.now() - paket.time;
         serverGameState.player[playerId].ping = Math.floor(timePing);
       }
+    }
+    if (paket.type === "location") {
+      for (let i = 0; i < gameState.player.length; i++) {
+        gameState.player[i].location = paket.attribute;
+        console.log("changed player location: ", gameState.player[i].location);
+      }
+    }
+    if (paket.type === "level++") {
+      gameState.game.level++;
     }
     if (paket.type == "reload") {
       serverGameState.ball = resetBall();

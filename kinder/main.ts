@@ -130,6 +130,7 @@ const sketch = (p: p5) => {
           id: 0,
           ping: 0,
           name: "Hans",
+          location: "level",
           color: "#FFA905",
           playerWidth: 64,
           playerHeight: 64,
@@ -150,6 +151,7 @@ const sketch = (p: p5) => {
           id: 1,
           ping: 0,
           name: "Laura",
+          location: "level",
           color: "#FF5400",
           playerWidth: 64,
           playerHeight: 64,
@@ -181,8 +183,7 @@ const sketch = (p: p5) => {
     if (gameState.player.length > 0) {
       switch (gameState.game.level) {
         case 1:
-          if (gameState.game.score <= gameState.levels.level1.win) {
-            // if (false) {
+          if (false) {
             level1();
           } else {
             shop1();
@@ -268,7 +269,7 @@ const sketch = (p: p5) => {
     const offset = 35;
     p.fill("#E5F0F4");
     p.textSize(20);
-    p.textFont("Urbanist");
+    p.textFont("Orbit");
     p.textAlign(p.LEFT);
     if (gameState.game.level === 1)
       p.text("You need: " + gameState.levels.level1.win, 12, offset);
@@ -476,7 +477,6 @@ const sketch = (p: p5) => {
       }
     }
   };
-
   // #region levels
   function level1() {
     p.background(20);
@@ -503,19 +503,41 @@ const sketch = (p: p5) => {
   }
 
   let fadeCounter = 255;
-  let shopCounter = 200;
+  let shopCounter = 0;
   let shopPos = 0;
   let newShopPos = false;
 
   function resetShop() {
     fadeCounter = 255;
-    shopCounter = 200;
+    shopCounter = 0;
     shopPos = 0;
     newShopPos = false;
   }
 
+  function checkPlayerPos(players, window: number) {
+    let onWindow = 0;
+    for (const player of players) {
+      if (
+        player.posX <= (window * gameState.props.width) / 3 &&
+        player.posX >= ((window - 1) * gameState.props.width) / 3
+      ) {
+        onWindow++;
+      }
+    }
+
+    if (onWindow === players.length) return true;
+    else {
+      return false;
+    }
+  }
+  let arrivedInShop = true;
   // #region shop
   function shop1() {
+    if (connectionInitialized && arrivedInShop) {
+      arrivedInShop = false;
+      socket.send(JSON.stringify({ type: "location", attribute: "shop" }));
+    }
+
     p.noStroke();
     if (fadeCounter <= 255) {
       fadeCounter += fadeCounter / 20;
@@ -524,53 +546,43 @@ const sketch = (p: p5) => {
       p.rect(0, 0, gameState.props.width, gameState.props.height);
     } else {
       p.background(20);
-      if (shopCounter > 0) {
-        if (
-          gameState.player[0].posX <= gameState.props.width / 3 &&
-          gameState.player[1].posX <= gameState.props.width / 3
-        ) {
-          if (shopPos != 1) shopCounter = 200;
-          shopCounter--;
+      p.fill(255);
+      p.textSize(64);
+      p.textAlign(p.CENTER);
+      p.text("Shop", gameState.props.width / 2, 85);
+      if (shopCounter < gameState.props.width / 3) {
+        if (checkPlayerPos(gameState.player, 1)) {
+          if (shopPos != 1) shopCounter = 0;
+          shopCounter += shopCounter / 150 + 1;
           shopPos = 1;
-        } else if (
-          gameState.player[0].posX >= gameState.props.width / 3 &&
-          gameState.player[0].posX <= (2 * gameState.props.width) / 3 &&
-          gameState.player[1].posX >= gameState.props.width / 3 &&
-          gameState.player[1].posX <= (2 * gameState.props.width) / 3
-        ) {
-          if (shopPos != 2) shopCounter = 200;
-          shopCounter--;
+        } else if (checkPlayerPos(gameState.player, 2)) {
+          if (shopPos != 2) shopCounter = 0;
+          shopCounter += shopCounter / 150 + 1;
           shopPos = 2;
-        } else if (
-          gameState.player[0].posX >= (2 * gameState.props.width) / 3 &&
-          gameState.player[1].posX >= (2 * gameState.props.width) / 3
-        ) {
-          if (shopPos != 3) shopCounter = 200;
-          shopCounter--;
+        } else if (checkPlayerPos(gameState.player, 3)) {
+          if (shopPos != 3) shopCounter = 0;
+          shopCounter += shopCounter / 150 + 1;
           shopPos = 3;
+        } else {
+          shopCounter = 0;
         }
 
         switch (shopPos) {
           case 1:
-            p.fill(shopCounter, 0, 0);
-            p.rect(
-              0,
-              0,
-              gameState.props.width / 3,
-              gameState.props.height - gameState.props.offset
-            );
+            p.fill(220);
+            p.rect(0, 175, shopCounter, gameState.props.offset);
             p.fill(255);
             p.textSize(32);
             p.textAlign(p.CENTER);
             p.text("Jump++", gameState.props.width / 6, 150);
             break;
           case 2:
-            p.fill(0, shopCounter, 0);
+            p.fill(220);
             p.rect(
               gameState.props.width / 3,
-              0,
-              gameState.props.width / 3,
-              gameState.props.height - gameState.props.offset
+              175,
+              shopCounter,
+              gameState.props.offset
             );
             p.fill(255);
             p.textSize(32);
@@ -578,12 +590,12 @@ const sketch = (p: p5) => {
             p.text("Dash++", gameState.props.width / 2, 150);
             break;
           case 3:
-            p.fill(0, 0, shopCounter);
+            p.fill(220);
             p.rect(
               (2 * gameState.props.width) / 3,
-              0,
-              gameState.props.width / 3,
-              gameState.props.height - gameState.props.offset
+              175,
+              shopCounter,
+              gameState.props.offset
             );
             p.fill(255);
             p.textSize(32);
@@ -593,31 +605,72 @@ const sketch = (p: p5) => {
             break;
         }
       } else {
-        switch (shopPos) {
-          case 1:
-            gameState.player[0].jumpSpeed -= 2;
-            gameState.player[1].jumpSpeed -= 2;
-            break;
-          case 2:
-            gameState.player[0].dashSpeed += 10;
-            gameState.player[1].dashSpeed += 10;
-            break;
-          case 3:
-            gameState.player[0].hitForce += 0.02;
-            gameState.player[1].dashSpeed += 10;
-            break;
+        if (!connectionInitialized) {
+          switch (shopPos) {
+            case 1:
+              gameState.player[0].jumpSpeed -= 2;
+              gameState.player[1].jumpSpeed -= 2;
+              break;
+            case 2:
+              gameState.player[0].dashSpeed += 10;
+              gameState.player[1].dashSpeed += 10;
+              break;
+            case 3:
+              gameState.player[0].hitForce += 0.02;
+              gameState.player[1].dashSpeed += 10;
+              break;
+          }
+        } else {
+          const playerId = getPlayerId(gameState.player, id);
+          switch (shopPos) {
+            case 1:
+              gameState.player[playerId].jumpSpeed -= 2;
+              if (socket.readyState === WebSocket.OPEN) {
+                const paket = {
+                  type: "upgrade",
+                  attribute: "jump",
+                };
+                socket.send(JSON.stringify(paket));
+              }
+              break;
+            case 2:
+              gameState.player[playerId].jumpSpeed -= 2;
+              if (socket.readyState === WebSocket.OPEN) {
+                const paket = {
+                  type: "upgrade",
+                  attribute: "dash",
+                };
+                socket.send(JSON.stringify(paket));
+              }
+              break;
+            case 3:
+              gameState.player[playerId].jumpSpeed -= 2;
+              if (socket.readyState === WebSocket.OPEN) {
+                const paket = {
+                  type: "upgrade",
+                  attribute: "hit",
+                };
+                socket.send(JSON.stringify(paket));
+              }
+              break;
+          }
         }
         gameState.ball = resetBall();
         gameState.game.level++;
         gameState.game.score = 0;
         resetShop();
+        if (connectionInitialized) {
+          socket.send(JSON.stringify({ type: "level++" }));
+          socket.send(JSON.stringify({ type: "location", attribute: "level" }));
+        }
       }
 
       keyInput();
       gameState = runPhysics(gameState);
       gameState.ball = resetBall();
-      drawPlayer(gameState.player[0]);
-      drawPlayer(gameState.player[1]);
+      for (const player of gameState.player) {
+        drawPlayer(player);
+      }
     }
   }
 };

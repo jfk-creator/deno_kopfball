@@ -35,6 +35,7 @@ export function initGameState() {
         velY: 0,
         id: 0,
         ping: 0,
+        location: "level",
         name: "Hans",
         color: "#FFA905",
         playerWidth: 64,
@@ -64,15 +65,31 @@ export function initGameState() {
 
 console.log("Gamestate size (kb): ", JSON.stringify(gameState).length * 2);
 
+function checkPlayerLocation(players, location: string) {
+  let onlocation = 0;
+  for (const player of players) {
+    if (player.location === location) {
+      onlocation++;
+    }
+  }
+
+  if (onlocation === players.length) return true;
+  else {
+    return false;
+  }
+}
+
 // #region runPhysics
 export function runPhysics(gs) {
   for (let i = 0; i < gs.player.length; i++) {
     gs.player[i] = movePlayer(gs.player[i]);
   }
-  gs.ball = ballPhysics(gs.ball);
-  gs.ball = moveBall(gs.ball);
-  for (let i = 0; i < gs.player.length; i++) {
-    gs.ball = kopfball(gs.player[i], gs.ball);
+  if (checkPlayerLocation(gameState.player, "level")) {
+    gs.ball = ballPhysics(gs.ball);
+    gs.ball = moveBall(gs.ball);
+    for (let i = 0; i < gs.player.length; i++) {
+      gs.ball = kopfball(gs.player[i], gs.ball);
+    }
   }
 
   return gs;
