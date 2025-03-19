@@ -1,0 +1,62 @@
+import { htmlObjects } from "./kopfball";
+
+let socket: WebSocket;
+let id = -1;
+let maxConnection = 5;
+let connectionInitialized = false;
+
+export function connectWebSocket() {
+  htmlObjects.info.innerHTML += `</br>trying to connect to: ${server_addr}</br>`;
+  socket = new WebSocket(server_addr);
+  socket.addEventListener("open", () => {
+    globalThis.socket = socket;
+    console.log("connected to server");
+    htmlObjects.info.innerHTML += `connected to server </br>`;
+  });
+  handleConnection(socket);
+}
+
+function handleConnection(socket: WebSocket) {
+  socket.addEventListener("message", (event) => {
+    let paket = JSON.parse(event.data);
+    if (paket.type == "init" && !connectionInitialized) {
+      globalThis.key = paket.key;
+      globalThis.players = paket.players;
+      for (const playerFromServer of players) {
+        if (playerFromServer.id == key) globalThis.player = playerFromServer;
+      }
+      htmlObjects.info.innerHTML += `Hallo Freund ${key + 1}</br>`;
+      connectionInitialized = true;
+      if (key > maxConnection) {
+        htmlObjects.info.innerHTML += "closing Connection.</br>";
+        socket.close();
+        connectionInitialized = false;
+      } else {
+        const playerName = localStorage.getItem("playerName");
+        if (playerName) {
+          const paket = {
+            type: "changeName",
+            name: playerName,
+          };
+          socket.send(JSON.stringify(paket));
+        }
+      }
+    }
+    if (connectionInitialized) {
+      if (paket.type == "players") {
+        players = paket.data;
+      }
+      if (paket.type == "ping") {
+        if (!paket.pong) {
+          paket.pong = true;
+          paket.id = id;
+          socket.send(JSON.stringify(paket));
+        }
+      }
+    }
+  });
+  socket.addEventListener("close", () => {
+    console.log("disconnected from server");
+    htmlObjects.info.innerHTML += `disconnected from server </br>`;
+  });
+}

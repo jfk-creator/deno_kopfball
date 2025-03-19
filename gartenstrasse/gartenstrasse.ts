@@ -130,8 +130,8 @@ function handleSocket(socket: WebSocket) {
   socket.onopen = () => {
     const paket = {
       type: "init",
-      id: key,
-      gs: serverGameState,
+      key: key,
+      players: serverGameState.player,
     };
     socket.send(JSON.stringify(paket));
   };
@@ -226,9 +226,9 @@ function broadcast() {
   for (const [id, socket] of sockets.entries()) {
     if (socket.readyState === WebSocket.OPEN) {
       const paket = {
-        type: "gameState",
+        type: "players",
         id: id,
-        gs: serverGameState,
+        data: serverGameState.player,
       };
       socket.send(JSON.stringify(paket));
       if (serverGameState.game.tick % serverGameState.props.frameRate == 0) {
