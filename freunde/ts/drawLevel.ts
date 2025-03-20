@@ -1,9 +1,11 @@
 import p5 from "p5";
-import { game, levelWins, Player, props } from "./types";
+import { game, levelWins, Player, props, serverGameState } from "./types";
 import { sprites } from "./game";
 import { clientData } from "./kopfball";
+import { runPhysics } from "./physics";
 
 export function drawLevel(p5: p5, players: Player[]) {
+  runPhysics(serverGameState);
   drawBackground(p5);
   drawPlayers(p5, players);
   drawUi(p5);

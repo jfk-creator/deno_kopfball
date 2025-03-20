@@ -1,9 +1,12 @@
 import { GameState, Player, props } from "./types";
 
 export function runPhysics(gameState: GameState): GameState {
-  gameState.players.forEach((playerInst) => {
-    playerInst = playerPhysics(playerInst);
-  });
+  // gameState.players.forEach((playerInst) => {
+  //   playerInst = playerPhysics(playerInst);
+  // });
+  for (let i = 0; i < gameState.players.length; i++) {
+    gameState.players[i] = playerPhysics(gameState.players[i]);
+  }
   return gameState;
 }
 
