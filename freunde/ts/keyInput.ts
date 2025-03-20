@@ -3,7 +3,6 @@ import p5 from "p5";
 export function keyInput(p5: p5, socket: WebSocket) {
   // a <-
   if (p5.keyIsDown(65) || p5.keyIsDown(p5.LEFT_ARROW)) {
-    console.log("hello");
     player.velX = -player.movementSpeed;
     if (socket.readyState === WebSocket.OPEN) {
       const paket = {
@@ -59,7 +58,7 @@ export function keyInput(p5: p5, socket: WebSocket) {
     }
   }
   // Jump, w, ^, space
-  if ((p5.keyIsDown(87) || p5.keyIsDown(p5.UP_ARROW) || p5.keyIsDown(32)) ) {
+  if (p5.keyIsDown(87) || p5.keyIsDown(p5.UP_ARROW) || p5.keyIsDown(32)) {
     player.velY = player.jumpSpeed;
     if (socket.readyState === WebSocket.OPEN) {
       const paket = {
@@ -69,5 +68,3 @@ export function keyInput(p5: p5, socket: WebSocket) {
     }
   }
 }
-
-let keyInputTimer = Date.now()

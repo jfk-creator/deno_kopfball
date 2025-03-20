@@ -40,7 +40,7 @@ export const clientData: ClientData = {
 function init() {
   const playerName = localStorage.getItem("playName");
   const highscore = localStorage.getItem("highscore");
-  globalThis.server_addr = "ws://192.168.179.133:42069";
+  globalThis.server_addr = "ws://192.168.178.22:42069";
   if (playerName) localData.localPlayerName = playerName;
   if (highscore) localData.localHighscore = parseFloat(highscore);
 }
