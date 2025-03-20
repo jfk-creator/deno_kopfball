@@ -74,7 +74,7 @@ function deletePlayer(players: player[], key: number) {
   return players;
 }
 
-Deno.serve({ port: 420 }, (request) => {
+Deno.serve({ port: 42069 }, (request) => {
   if (onStartUp) {
     onStartUp = false;
     serverGameState.player = [];
