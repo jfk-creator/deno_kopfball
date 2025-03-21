@@ -87,14 +87,6 @@ export interface GameState {
   levelWins: number[];
 }
 
-export const serverGameState: GameState = {
-  props: props,
-  game: game,
-  players: players,
-  ball: ball,
-  levelWins: levelWins,
-};
-
 export interface pingPakete {
   type: string;
   id: number;

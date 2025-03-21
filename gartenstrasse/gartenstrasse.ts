@@ -132,6 +132,7 @@ function handleSocket(socket: WebSocket) {
       type: "init",
       key: key,
       players: serverGameState.player,
+      ball: serverGameState.ball,
     };
     socket.send(JSON.stringify(paket));
   };
@@ -228,7 +229,8 @@ function broadcast() {
       const paket = {
         type: "players",
         id: id,
-        data: serverGameState.player,
+        players: serverGameState.player,
+        ball: serverGameState.ball,
       };
       socket.send(JSON.stringify(paket));
       if (serverGameState.game.tick % serverGameState.props.frameRate == 0) {
@@ -237,6 +239,13 @@ function broadcast() {
           id: -1,
           pong: false,
           time: performance.now(),
+        };
+        socket.send(JSON.stringify(pingPaket));
+      }
+      if (serverGameState.game.tick % serverGameState.props.frameRate == 0) {
+        const pingPaket = {
+          type: "score",
+          score: serverGameState.game.score,
         };
         socket.send(JSON.stringify(pingPaket));
       }

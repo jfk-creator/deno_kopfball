@@ -39,6 +39,12 @@ const sketch = (p5: p5) => {
           //   drawNirvana();
           break;
       }
+      if (p5.frameCount % 60 == 0) {
+        htmlObjects.playerInfo.innerHTML = "Players:</br>";
+        for (const playerInst of players) {
+          htmlObjects.playerInfo.innerHTML += `<span style="color:${playerInst.color}">${playerInst.name}: ${playerInst.ping}ms</span></br>`;
+        }
+      }
     }
   };
 };

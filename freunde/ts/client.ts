@@ -1,4 +1,5 @@
 import { htmlObjects } from "./kopfball";
+import { game } from "./types";
 
 let socket: WebSocket;
 let id = -1;
@@ -22,6 +23,7 @@ function handleConnection(socket: WebSocket) {
     if (paket.type == "init" && !connectionInitialized) {
       globalThis.key = paket.key;
       globalThis.players = paket.players;
+      globalThis.ball = paket.ball;
       for (const playerFromServer of players) {
         if (playerFromServer.id == key) globalThis.player = playerFromServer;
       }
@@ -44,7 +46,8 @@ function handleConnection(socket: WebSocket) {
     }
     if (connectionInitialized) {
       if (paket.type == "players") {
-        players = paket.data;
+        players = paket.players;
+        ball = paket.ball;
       }
       if (paket.type == "ping") {
         if (!paket.pong) {
@@ -52,6 +55,9 @@ function handleConnection(socket: WebSocket) {
           paket.id = id;
           socket.send(JSON.stringify(paket));
         }
+      }
+      if (paket.type == "score") {
+        game.score = paket.score;
       }
     }
   });
