@@ -24,6 +24,7 @@ function handleConnection(socket: WebSocket) {
       globalThis.key = paket.key;
       globalThis.players = paket.players;
       globalThis.ball = paket.ball;
+      game.nextPlayer = paket.nextPlayer;
       for (const playerFromServer of players) {
         if (playerFromServer.id == key) globalThis.player = playerFromServer;
       }
@@ -48,6 +49,8 @@ function handleConnection(socket: WebSocket) {
       if (paket.type == "players") {
         players = paket.players;
         ball = paket.ball;
+        // FIXME:
+        game.nextPlayer = paket.nextPlayer;
       }
       if (paket.type == "ping") {
         if (!paket.pong) {

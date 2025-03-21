@@ -231,6 +231,7 @@ function broadcast() {
         id: id,
         players: serverGameState.player,
         ball: serverGameState.ball,
+        nextPlayer: serverGameState.game.nextPlayer,
       };
       socket.send(JSON.stringify(paket));
       if (serverGameState.game.tick % serverGameState.props.frameRate == 0) {
