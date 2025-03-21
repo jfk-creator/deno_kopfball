@@ -118,10 +118,10 @@ function kopfball(playerInst: Player, ballInst: Ball): Ball {
       game.score = 0;
     }
 
-    ballInst.velY += -player.velY * player.hitForce;
+    ballInst.velY += -playerInst.velY * playerInst.hitForce;
     ballInst.velY *= -1;
     ballInst.velX +=
-      ((ballInst.posX - player.posX - player.playerWidth / 2) / 25) * 4;
+      ((ballInst.posX - playerInst.posX - playerInst.playerWidth / 2) / 25) * 4;
     return ballInst;
   }
   return ballInst;

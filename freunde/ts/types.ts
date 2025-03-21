@@ -24,7 +24,7 @@ export const ball = {
   velY: -2,
   gravity: 0.1,
   airDrag: 0.995,
-  ballR: 8,
+  ballR: 20,
 };
 
 export const levelWins = [1000, 10000, 20000, 30000];
@@ -93,3 +93,45 @@ export interface pingPakete {
   pong: boolean;
   time: number;
 }
+
+export const hans: Player = {
+  posX: 480,
+  posY: 540,
+  velX: Math.random() * 50 - 25,
+  velY: 0,
+  id: 0,
+  ping: 0,
+  name: "Hans",
+  color: "#FFA905",
+  playerWidth: 64,
+  playerHeight: 64,
+  playerOffset: 20,
+  movementSpeed: 5,
+  jumpSpeed: -3,
+  dashSpeed: 15,
+  resistance: 0.8999,
+  gravity: 0.1,
+  hitForce: 1.2,
+  jumpCooldown: 0,
+};
+
+export const laura: Player = {
+  posX: 480,
+  posY: 540,
+  velX: Math.random() * 50 - 25,
+  velY: 0,
+  id: 1,
+  ping: 0,
+  name: "Laura",
+  color: "#FF5400",
+  playerWidth: 64,
+  playerHeight: 64,
+  playerOffset: 20,
+  movementSpeed: 5,
+  jumpSpeed: -3,
+  dashSpeed: 15,
+  resistance: 0.8999,
+  gravity: 0.1,
+  hitForce: 1.2,
+  jumpCooldown: 0,
+};

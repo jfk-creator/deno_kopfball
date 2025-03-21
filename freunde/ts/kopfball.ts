@@ -1,5 +1,6 @@
 import { connectWebSocket } from "./client";
 import { startGame } from "./game";
+import { hans, laura } from "./types";
 interface HTMLObjects {
   info: HTMLElement;
   nameVal: HTMLInputElement;
@@ -40,7 +41,9 @@ export const clientData: ClientData = {
 function init() {
   const playerName = localStorage.getItem("playName");
   const highscore = localStorage.getItem("highscore");
-  globalThis.server_addr = "ws://192.168.178.22:42069";
+  globalThis.server_addr = "ws://77.186.6.98:42069";
+  globalThis.players = [hans, laura];
+  globalThis.player = hans;
   if (playerName) localData.localPlayerName = playerName;
   if (highscore) localData.localHighscore = parseFloat(highscore);
 }
@@ -48,3 +51,32 @@ function init() {
 init();
 if (htmlObjects) connectWebSocket();
 startGame();
+
+if (sendNameButton)
+  sendNameButton.addEventListener("click", function () {
+    if (nameVal) player.name = nameVal.value;
+    nameVal.blur();
+    localStorage.setItem("playerName", nameVal.value);
+    if (socket.readyState === WebSocket.OPEN) {
+      const paket = {
+        type: "changeName",
+        name: nameVal.value,
+      };
+      socket.send(JSON.stringify(paket));
+    }
+  });
+
+nameVal.addEventListener("keydown", function (event) {
+  if (event.key === "Enter") {
+    nameVal.blur();
+    localStorage.setItem("playerName", nameVal.value);
+    player.name = nameVal.value;
+    if (socket.readyState === WebSocket.OPEN) {
+      const paket = {
+        type: "changeName",
+        name: nameVal.value,
+      };
+      socket.send(JSON.stringify(paket));
+    }
+  }
+});

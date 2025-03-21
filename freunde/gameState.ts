@@ -57,7 +57,7 @@ export function initGameState() {
       velY: -2,
       gravity: 0.1,
       airDrag: 0.995,
-      ballR: 8,
+      ballR: 20,
     },
   };
   return gameState;
@@ -103,7 +103,7 @@ export function resetBall() {
     velY: -2,
     gravity: 0.1,
     airDrag: 0.995,
-    ballR: 8,
+    ballR: 20,
   };
 }
 function movePlayer(player) {
