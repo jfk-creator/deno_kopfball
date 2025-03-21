@@ -8,7 +8,7 @@ export default defineConfig({
   // enabling polling can sometimes help.
   server: {
     watch: {
-      usePolling: true, // Enable polling (use only if necessary)
+      usePolling: true,
     },
   },
 });

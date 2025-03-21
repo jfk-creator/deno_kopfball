@@ -46,5 +46,5 @@ function init() {
 }
 
 init();
-connectWebSocket();
+if (htmlObjects) connectWebSocket();
 startGame();

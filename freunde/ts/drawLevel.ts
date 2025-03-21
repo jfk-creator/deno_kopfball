@@ -1,5 +1,13 @@
 import p5 from "p5";
-import { game, levelWins, Player, props, serverGameState } from "./types";
+import {
+  Ball,
+  ball,
+  game,
+  levelWins,
+  Player,
+  props,
+  serverGameState,
+} from "./types";
 import { sprites } from "./game";
 import { clientData } from "./kopfball";
 import { runPhysics } from "./physics";
@@ -7,12 +15,18 @@ import { runPhysics } from "./physics";
 export function drawLevel(p5: p5, players: Player[]) {
   runPhysics(serverGameState);
   drawBackground(p5);
+  drawBall(p5, ball);
   drawPlayers(p5, players);
   drawUi(p5);
 }
 
 function drawBackground(p5: p5) {
   p5.background(20);
+}
+
+function drawBall(p5: p5, ball: Ball) {
+  p5.fill(180);
+  p5.circle(ball.posX, ball.posY, ball.ballR);
 }
 
 function drawPlayers(p5: p5, players: Player[]) {
