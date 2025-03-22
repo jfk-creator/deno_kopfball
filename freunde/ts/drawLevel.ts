@@ -26,8 +26,10 @@ function drawBackground(p5: p5) {
 }
 
 function drawBall(p5: p5, ball: Ball, nextPlayerId: number) {
-  if (players[nextPlayerId]) p5.fill(players[nextPlayerId].color);
-  else nextPlayerId = getNextPlayerId(players, nextPlayerId);
+  console.log("key:", key);
+  console.log(nextPlayerId);
+  // if (!players[nextPlayerId])
+  //   nextPlayerId = getNextPlayerId(players, nextPlayerId);
   const playerId: number = getPlayerId(players, nextPlayerId);
   p5.fill(players[playerId].color);
   p5.circle(ball.posX, ball.posY, ball.ballR);
