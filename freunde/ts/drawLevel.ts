@@ -28,7 +28,7 @@ function drawBackground(p5: p5) {
 function drawBall(p5: p5, ball: Ball, nextPlayerId: number) {
   console.log("key:", key);
   console.log(nextPlayerId);
-  // if (!players[nextPlayerId])
+  // if c(!players[nextPlayerId])
   //   nextPlayerId = getNextPlayerId(players, nextPlayerId);
   const playerId: number = getPlayerId(players, nextPlayerId);
   p5.fill(players[playerId].color);
