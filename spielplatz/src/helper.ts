@@ -1,4 +1,4 @@
-import { Player, ServerGameState } from "../freunde/ts/gameState.ts";
+import { Player, GameState } from "../../freunde/ts/types.ts";
 
 export function saId(ids: number[]): number {
   for (let i = 0; i < ids.length; i++) {
@@ -38,7 +38,7 @@ export function deletePlayer(players: Player[], key: number) {
 }
 
 export function broadcast(
-  serverGameState: ServerGameState,
+  serverGameState: GameState,
   sockets: Map<number, WebSocket>
 ) {
   for (const [id, socket] of sockets.entries()) {
@@ -46,7 +46,9 @@ export function broadcast(
       const paket = {
         type: "players",
         id: id,
-        data: serverGameState.players,
+        players: serverGameState.players,
+        ball: serverGameState.ball,
+        nextPlayer: serverGameState.game.nextPlayer,
       };
       socket.send(JSON.stringify(paket));
       if (serverGameState.game.tick % serverGameState.props.frameRate == 0) {
@@ -55,6 +57,13 @@ export function broadcast(
           id: -1,
           pong: false,
           time: performance.now(),
+        };
+        socket.send(JSON.stringify(pingPaket));
+      }
+      if (serverGameState.game.tick % serverGameState.props.frameRate == 0) {
+        const pingPaket = {
+          type: "score",
+          score: serverGameState.game.score,
         };
         socket.send(JSON.stringify(pingPaket));
       }

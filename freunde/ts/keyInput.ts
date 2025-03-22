@@ -48,7 +48,7 @@ export function keyInput(p5: p5, socket: WebSocket) {
     }
   }
   // r: reload
-  if (p5.keyIsDown(82) && p5.keyIsDown(p5.CONTROL)) {
+  if (p5.keyIsDown(82) && p5.keyIsDown(p5.SHIFT)) {
     console.log("reloading game");
     if (socket.readyState === WebSocket.OPEN) {
       const paket = {

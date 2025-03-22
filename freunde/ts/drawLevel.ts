@@ -2,7 +2,7 @@ import p5 from "p5";
 import { Ball, game, GameState, levelWins, Player, props } from "./types";
 import { sprites } from "./game";
 import { clientData } from "./kopfball";
-import { getNextPlayerId, runPhysics } from "./physics";
+import { getNextPlayerId, getPlayerId, runPhysics } from "./physics";
 
 export function drawLevel(p5: p5, players: Player[]) {
   const serverGameState: GameState = {
@@ -70,8 +70,8 @@ function drawPlayer(p5: p5, playerInst: Player) {
 function drawNextPlayerCircle(p5: p5, nextPlayerId: number) {
   if (players[nextPlayerId]) p5.fill(players[nextPlayerId].color);
   else nextPlayerId = getNextPlayerId(players, nextPlayerId);
-  // if (players[nextPlayerId]) p5.fill(players[nextPlayerId].color);
-  p5.fill(players[nextPlayerId].color);
+  const playerId: number = getPlayerId(players, nextPlayerId);
+  p5.fill(players[playerId].color);
   p5.circle(props.width / 2, 125, 20);
 }
 

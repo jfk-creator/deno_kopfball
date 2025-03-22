@@ -6,7 +6,11 @@ export function runPhysics(gameState: GameState): GameState {
   }
   gameState.ball = ballPhysics(gameState.ball);
   for (let i = 0; i < gameState.players.length; i++) {
-    gameState.ball = kopfball(gameState.players[i], ball);
+    gameState.ball = kopfball(
+      gameState.players[i],
+      gameState.ball,
+      gameState.players
+    );
   }
   return gameState;
 }
@@ -43,17 +47,19 @@ function addResistance(playerInst: Player): Player {
 }
 
 function addGravity(playerInst: Player): Player {
-  if (player.posY <= props.height) player.velY += player.gravity * 2;
+  if (playerInst.posY <= props.height)
+    playerInst.velY += playerInst.gravity * 2;
   else {
-    player.velY = 0;
-    player.posY = props.height;
+    playerInst.velY = 0;
+    playerInst.posY = props.height;
   }
   return playerInst;
 }
 
 function playerBoundingBoxes(playerInst: Player): Player {
-  if (player.posX < 0) player.velX += 20;
-  if (player.posX > props.width - player.playerWidth) player.velX += -20;
+  if (playerInst.posX < 0) playerInst.velX = 15;
+  if (playerInst.posX > props.width - playerInst.playerWidth)
+    playerInst.velX = -15;
   return playerInst;
 }
 
@@ -70,7 +76,7 @@ function addBallResistance(ballInst: Ball): Ball {
 }
 
 function addBallGravity(ballInst: Ball): Ball {
-  ball.velY += ball.gravity;
+  ballInst.velY += ballInst.gravity;
   return ballInst;
 }
 
@@ -85,7 +91,11 @@ function ballBoundingBoxes(ballInst: Ball): Ball {
   return ballInst;
 }
 
-function kopfball(playerInst: Player, ballInst: Ball): Ball {
+function kopfball(
+  playerInst: Player,
+  ballInst: Ball,
+  playerArr: Player[]
+): Ball {
   if (
     ballInst.posX - playerInst.posX < playerInst.playerWidth + 3 &&
     ballInst.posX - playerInst.posX > -3 &&
@@ -112,7 +122,7 @@ function kopfball(playerInst: Player, ballInst: Ball): Ball {
         localStorage.setItem("highscore", JSON.stringify(game.highscore));
       }
 
-      game.nextPlayer = getNextPlayerId(players, game.nextPlayer);
+      game.nextPlayer = getNextPlayerId(playerArr, game.nextPlayer);
     } else {
       game.hits = 0;
       game.score = 0;
@@ -135,6 +145,16 @@ export function getNextPlayerId(players: Player[], playerId: number): number {
     }
   }
   return players[0].id;
+}
+
+export function getPlayerId(players: Player[], key: number): number {
+  for (let i = 0; i < players.length; i++) {
+    if (players[i].id === key) {
+      // console.log(`found id: ${players[i].id} as: ${i}`);
+      return i;
+    }
+  }
+  return -1;
 }
 
 function cutDecimal(number: number, cut: number): number {

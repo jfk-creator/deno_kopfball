@@ -17,6 +17,8 @@ import {
   broadcast,
 } from "./src/helper.ts";
 
+import { runPhysics } from "../freunde/ts/physics.ts";
+
 const debug = true;
 const sockets = new Map<number, WebSocket>();
 const maxConnection = 5;
@@ -37,7 +39,7 @@ const serverGameState = {
   levelWins: levelWins,
 };
 
-Deno.serve({ port: 420 }, (request) => {
+Deno.serve({ port: 42069 }, (request) => {
   if (request.headers.get("upgrade") !== "websocket") {
     return new Response(null, { status: 501 });
   }
@@ -54,8 +56,9 @@ function handleSocket(socket: WebSocket) {
   const key: number = saId(game.ids);
   game.ids[key] = 1;
   if (debug) console.log("ids: ", game.ids);
-  sockets.set(key, socket);
+  if (debug) console.log("new key: ", key);
 
+  sockets.set(key, socket);
   serverGameState.players.push(getPlayerFromArr(key));
 
   socket.onopen = () => {
@@ -119,7 +122,17 @@ function handleSocket(socket: WebSocket) {
       }
     }
     if (paket.type == "reload") {
-      serverGameState.ball = ball;
+      console.log("reloading ball");
+
+      serverGameState.ball = {
+        posX: 460,
+        posY: 20,
+        velX: Math.random() * 8 - 4,
+        velY: -2,
+        gravity: 0.1,
+        airDrag: 0.995,
+        ballR: 20,
+      };
     }
     // #endregion
   };
