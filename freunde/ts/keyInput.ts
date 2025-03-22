@@ -1,5 +1,7 @@
 import p5 from "p5";
 
+let debugTimer = 0;
+
 export function keyInput(p5: p5, socket: WebSocket) {
   // a <-
   if (p5.keyIsDown(65) || p5.keyIsDown(p5.LEFT_ARROW)) {
@@ -66,5 +68,11 @@ export function keyInput(p5: p5, socket: WebSocket) {
       };
       socket.send(JSON.stringify(paket));
     }
+  }
+  //debug
+  if (p5.keyIsDown(80) && Math.abs(Date.now() - debugTimer) > 100) {
+    console.log(debugTimer);
+    debugTimer = Date.now();
+    debug = !debug;
   }
 }

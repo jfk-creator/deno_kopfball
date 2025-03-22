@@ -1,18 +1,85 @@
-import { Ball, game, GameState, Player, props } from "./types";
+import {
+  Ball,
+  ballArr,
+  game,
+  GameState,
+  levelWins,
+  Player,
+  props,
+  resetBall,
+} from "./types.ts";
 
 export function runPhysics(gameState: GameState): GameState {
   for (let i = 0; i < gameState.players.length; i++) {
     gameState.players[i] = playerPhysics(gameState.players[i]);
   }
-  gameState.ball = ballPhysics(gameState.ball);
-  for (let i = 0; i < gameState.players.length; i++) {
-    gameState.ball = kopfball(
-      gameState.players[i],
-      gameState.ball,
-      gameState.players
-    );
+
+  if (gameState.game.drawLevel) {
+    // levelTime
+    gameState.ball = ballPhysics(gameState.ball);
+    for (let i = 0; i < gameState.players.length; i++) {
+      gameState.ball = kopfball(
+        gameState.players[i],
+        gameState.ball,
+        gameState.players
+      );
+    }
+  }
+
+  if (!gameState.game.drawLevel) {
+    // shopTime
+    handleItemLoading(gameState.players);
+    if (gameState.game.drawLevel) gameState.ball = resetBall(game.level - 1);
   }
   return gameState;
+}
+let positionChanged = 0;
+
+function handleItemLoading(playersArr: Player[]) {
+  let loadedItem = 0;
+  if (loadedItem === 0) {
+    for (let i = 0; i < 3; i++) {
+      if (checkPlayersPos(playersArr, i + 1)) {
+        if (positionChanged != i) {
+          positionChanged = i;
+          setItemLoadingBarZero();
+        }
+        if (game.itemLoadingBar[i] < props.width / 3)
+          game.itemLoadingBar[i] += (game.itemLoadingBar[i] + 1) / 25;
+        else {
+          loadedItem = i;
+          setItem(loadedItem, playersArr);
+          game.drawLevel = true;
+          game.level++;
+        }
+      }
+    }
+  }
+}
+
+function setItem(loadedItem: number, playerArr: Player[]) {
+  if (loadedItem === 0) {
+    for (let i = 0; i < playerArr.length; i++) {
+      playerArr[i].jumpSpeed -= 0.2;
+    }
+  }
+  if (loadedItem === 1) {
+    for (let i = 0; i < playerArr.length; i++) {
+      playerArr[i].dashSpeed += 2;
+    }
+  }
+  if (loadedItem === 2) {
+    for (let i = 0; i < playerArr.length; i++) {
+      playerArr[i].hitForce += 0.2;
+    }
+  }
+  if (loadedItem > 2 || loadedItem < 0) console.error("loadedItemError");
+}
+
+function setItemLoadingBarZero() {
+  for (let i = 0; i < 3; i++) {
+    game.itemLoadingBar[i] = 0;
+  }
 }
 
 function playerPhysics(playerInst: Player): Player {
@@ -20,8 +87,10 @@ function playerPhysics(playerInst: Player): Player {
   playerInst = addResistance(playerInst);
   playerInst = addGravity(playerInst);
   playerInst = playerBoundingBoxes(playerInst);
-  playerInst.velX = cutDecimal(playerInst.velX, 10);
-  playerInst.velY = cutDecimal(playerInst.velY, 10);
+  playerInst.posX = cutDecimal(playerInst.posX, 3);
+  playerInst.posY = cutDecimal(playerInst.posY, 3);
+  playerInst.velX = cutDecimal(playerInst.velX, 3);
+  playerInst.velY = cutDecimal(playerInst.velY, 3);
   return playerInst;
 }
 
@@ -30,8 +99,10 @@ function ballPhysics(ballInst: Ball): Ball {
   ballInst = addBallResistance(ballInst);
   ballInst = addBallGravity(ballInst);
   ballInst = ballBoundingBoxes(ballInst);
-  ballInst.velX = cutDecimal(ballInst.velX, 10);
-  ballInst.velY = cutDecimal(ballInst.velY, 10);
+  ballInst.posX = cutDecimal(ballInst.posX, 3);
+  ballInst.posY = cutDecimal(ballInst.posY, 3);
+  ballInst.velX = cutDecimal(ballInst.velX, 3);
+  ballInst.velY = cutDecimal(ballInst.velY, 3);
   return ballInst;
 }
 
@@ -47,8 +118,7 @@ function addResistance(playerInst: Player): Player {
 }
 
 function addGravity(playerInst: Player): Player {
-  if (playerInst.posY <= props.height)
-    playerInst.velY += playerInst.gravity * 2;
+  if (playerInst.posY < props.height) playerInst.velY += playerInst.gravity * 2;
   else {
     playerInst.velY = 0;
     playerInst.posY = props.height;
@@ -121,6 +191,11 @@ function kopfball(
         game.highscore = game.score;
         localStorage.setItem("highscore", JSON.stringify(game.highscore));
       }
+      if (game.score > levelWins[(game.level - 1) % levelWins.length]) {
+        game.drawLevel = false;
+        game.score = 0;
+        setItemLoadingBarZero();
+      }
 
       game.nextPlayer = getNextPlayerId(playerArr, game.nextPlayer);
     } else {
@@ -160,4 +235,20 @@ export function getPlayerId(players: Player[], key: number): number {
 function cutDecimal(number: number, cut: number): number {
   const factor = Math.pow(10, cut);
   return Math.floor(number * factor) / factor;
+}
+
+export function checkPlayersPos(playersArr: Player[], window: number): boolean {
+  let onWindow = 0;
+  for (const playerInst of playersArr) {
+    if (
+      playerInst.posX <= (window * props.width) / 3 &&
+      playerInst.posX >= ((window - 1) * props.width) / 3
+    ) {
+      onWindow++;
+    }
+  }
+  if (onWindow === playersArr.length) return true;
+  else {
+    return false;
+  }
 }

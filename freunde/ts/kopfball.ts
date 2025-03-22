@@ -1,6 +1,6 @@
-import { connectWebSocket } from "./client";
-import { startGame } from "./game";
-import { hans, laura } from "./types";
+import { connectWebSocket } from "./client.ts";
+import { startGame } from "./game.ts";
+import { hans, laura } from "./types.ts";
 interface HTMLObjects {
   info: HTMLElement;
   nameVal: HTMLInputElement;
@@ -44,6 +44,7 @@ function init() {
   globalThis.server_addr = "ws://192.168.178.22:42069";
   globalThis.players = [hans, laura];
   globalThis.player = hans;
+  globalThis.debug = false;
   if (playerName) localData.localPlayerName = playerName;
   if (highscore) localData.localHighscore = parseFloat(highscore);
 }

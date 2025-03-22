@@ -46,11 +46,14 @@ function handleConnection(socket: WebSocket) {
       }
     }
     if (connectionInitialized) {
-      if (paket.type == "players") {
+      if (paket.type == "gameState") {
         players = paket.players;
         ball = paket.ball;
-        // FIXME:
         game.nextPlayer = paket.nextPlayer;
+        game.score = paket.score;
+        game.level = paket.level;
+        game.drawLevel = paket.drawLevel;
+        game.itemLoadingBar = paket.itemLoadingBar;
       }
       if (paket.type == "ping") {
         if (!paket.pong) {

@@ -44,11 +44,15 @@ export function broadcast(
   for (const [id, socket] of sockets.entries()) {
     if (socket.readyState === WebSocket.OPEN) {
       const paket = {
-        type: "players",
+        type: "gameState",
         id: id,
         players: serverGameState.players,
         ball: serverGameState.ball,
         nextPlayer: serverGameState.game.nextPlayer,
+        score: serverGameState.game.score,
+        level: serverGameState.game.level,
+        drawLevel: serverGameState.game.drawLevel,
+        itemLoadingBar: serverGameState.game.itemLoadingBar,
       };
       socket.send(JSON.stringify(paket));
       if (serverGameState.game.tick % serverGameState.props.frameRate == 0) {

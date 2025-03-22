@@ -4,3 +4,4 @@ declare var socket: WebSocket;
 declare var server_addr: string;
 declare var key: number;
 declare var ball: Ball;
+declare var debug: boolean;

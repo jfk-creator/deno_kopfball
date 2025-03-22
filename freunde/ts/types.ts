@@ -1,4 +1,4 @@
-export const game = {
+export const game: Game = {
   tick: 0,
   ids: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   level: 1,
@@ -8,26 +8,84 @@ export const game = {
   score: 0,
   hits: 0,
   nextPlayer: 0,
+  itemLoadingBar: [0, 0, 0],
 };
 
-export const props = {
+export const props: Props = {
   frameRate: 90,
   width: 960,
   height: 540,
   offset: 20,
 };
 
-export const ball = {
+export const ball: Ball = {
   posX: 460,
   posY: 20,
   velX: Math.random() * 8 - 4,
   velY: -2,
   gravity: 0.1,
   airDrag: 0.995,
-  ballR: 20,
+  ballR: 30,
 };
 
-export const levelWins = [1000, 10000, 20000, 30000];
+export const ballArr: Ball[] = [
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.1,
+    airDrag: 0.995,
+    ballR: 30,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.12,
+    airDrag: 0.995,
+    ballR: 25,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.16,
+    airDrag: 0.995,
+    ballR: 15,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.2,
+    airDrag: 0.995,
+    ballR: 10,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.3,
+    airDrag: 0.995,
+    ballR: 5,
+  },
+];
+
+export function resetBall(level: number): Ball {
+  let ball = ballArr[level % ballArr.length];
+  ball.posX = 460;
+  ball.posY = 20;
+  ball.velX = Math.random() * 8 - 4;
+
+  return ball;
+}
+
+export const levelWins = [10000, 25000, 50000, 75000, 100000];
 
 export interface Game {
   tick: number;
@@ -39,6 +97,7 @@ export interface Game {
   score: number;
   hits: number;
   nextPlayer: number;
+  itemLoadingBar: number[];
 }
 
 export interface Props {

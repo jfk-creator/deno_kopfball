@@ -3,6 +3,7 @@ import { htmlObjects } from "./kopfball";
 import { game, props } from "./types";
 import { keyInput } from "./keyInput";
 import { drawLevel } from "./drawLevel";
+import { drawShop } from "./drawShop";
 
 export function startGame() {
   new p5(sketch);
@@ -33,10 +34,11 @@ const sketch = (p5: p5) => {
       switch (game.level) {
         case 1:
           if (game.drawLevel) drawLevel(p5, players);
-          //   else drawShop();
+          else drawShop(p5, players);
           break;
         default:
-          //   drawNirvana();
+          if (game.drawLevel) drawLevel(p5, players);
+          else drawShop(p5, players);
           break;
       }
       if (p5.frameCount % 60 == 0) {

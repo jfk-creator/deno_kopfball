@@ -7,6 +7,7 @@ import {
   Ball,
   Props,
   Game,
+  resetBall,
 } from "../freunde/ts/types.ts";
 import { getPlayerFromArr } from "./src/freunde.ts";
 import {
@@ -107,7 +108,8 @@ function handleSocket(socket: WebSocket) {
       );
       if (
         performance.now() - serverGameState.players[playerId].jumpCooldown >
-        500
+          500 &&
+        serverGameState.players[playerId].posY >= props.height
       ) {
         serverGameState.players[playerId].velY =
           serverGameState.players[playerId].jumpSpeed;
@@ -124,15 +126,7 @@ function handleSocket(socket: WebSocket) {
     if (paket.type == "reload") {
       console.log("reloading ball");
 
-      serverGameState.ball = {
-        posX: 460,
-        posY: 20,
-        velX: Math.random() * 8 - 4,
-        velY: -2,
-        gravity: 0.1,
-        airDrag: 0.995,
-        ballR: 20,
-      };
+      serverGameState.ball = resetBall(serverGameState.game.level - 1);
     }
     // #endregion
   };
