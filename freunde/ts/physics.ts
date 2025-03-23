@@ -175,12 +175,12 @@ function kopfball(
         playerInst.playerHeight -
         playerInst.playerOffset +
         15 -
-        ballInst.ballR &&
+        ballInst.ballR / 2 &&
     ballInst.posY >
       playerInst.posY -
         playerInst.playerHeight -
         playerInst.playerOffset -
-        ballInst.ballR
+        ballInst.ballR / 2
   ) {
     if (playerInst.id == game.nextPlayer) {
       game.hits++;

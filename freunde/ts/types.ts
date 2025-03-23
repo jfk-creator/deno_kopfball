@@ -23,18 +23,37 @@ export const ball: Ball = {
   posY: 20,
   velX: Math.random() * 8 - 4,
   velY: -2,
-  gravity: 0.1,
+  gravity: 0.05,
   airDrag: 0.995,
-  ballR: 30,
+  ballR: 40,
 };
 
 export const ballArr: Ball[] = [
+  ball,
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.075,
+    airDrag: 0.995,
+    ballR: 35,
+  },
   {
     posX: 460,
     posY: 20,
     velX: Math.random() * 8 - 4,
     velY: -2,
     gravity: 0.1,
+    airDrag: 0.995,
+    ballR: 32,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.125,
     airDrag: 0.995,
     ballR: 30,
   },
@@ -43,9 +62,9 @@ export const ballArr: Ball[] = [
     posY: 20,
     velX: Math.random() * 8 - 4,
     velY: -2,
-    gravity: 0.12,
+    gravity: 0.15,
     airDrag: 0.995,
-    ballR: 25,
+    ballR: 27,
   },
   {
     posX: 460,
@@ -54,7 +73,25 @@ export const ballArr: Ball[] = [
     velY: -2,
     gravity: 0.16,
     airDrag: 0.995,
-    ballR: 15,
+    ballR: 25,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.17,
+    airDrag: 0.995,
+    ballR: 22,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.18,
+    airDrag: 0.995,
+    ballR: 20,
   },
   {
     posX: 460,
@@ -63,7 +100,43 @@ export const ballArr: Ball[] = [
     velY: -2,
     gravity: 0.2,
     airDrag: 0.995,
+    ballR: 18,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.22,
+    airDrag: 0.995,
+    ballR: 15,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.24,
+    airDrag: 0.995,
+    ballR: 12,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.26,
+    airDrag: 0.995,
     ballR: 10,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.28,
+    airDrag: 0.995,
+    ballR: 8,
   },
   {
     posX: 460,
@@ -73,6 +146,33 @@ export const ballArr: Ball[] = [
     gravity: 0.3,
     airDrag: 0.995,
     ballR: 5,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.4,
+    airDrag: 0.995,
+    ballR: 4,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.4,
+    airDrag: 0.993,
+    ballR: 3,
+  },
+  {
+    posX: 460,
+    posY: 20,
+    velX: Math.random() * 8 - 4,
+    velY: -2,
+    gravity: 0.4,
+    airDrag: 0.991,
+    ballR: 3,
   },
 ];
 
@@ -85,7 +185,10 @@ export function resetBall(level: number): Ball {
   return ball;
 }
 
-export const levelWins = [10000, 25000, 50000, 75000, 100000];
+export const levelWins = [
+  20000, 30000, 35000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 100000,
+  100000, 100000, 100000, 100000, 100000,
+];
 
 export interface Game {
   tick: number;
