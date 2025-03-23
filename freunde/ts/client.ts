@@ -1,16 +1,16 @@
 import { htmlObjects } from "./kopfball";
 import { game } from "./types";
 
-let socket: WebSocket;
+let socketI: WebSocket;
 let id = -1;
 let maxConnection = 5;
 let connectionInitialized = false;
 
 export function connectWebSocket() {
   htmlObjects.info.innerHTML += `</br>trying to connect to: ${server_addr}</br>`;
-  socket = new WebSocket(server_addr);
-  socket.addEventListener("open", () => {
-    globalThis.socket = socket;
+  socketI = new WebSocket(server_addr);
+  globalThis.socket = socketI;
+  socketI.addEventListener("open", () => {
     console.log("connected to server");
     htmlObjects.info.innerHTML += `connected to server </br>`;
   });
