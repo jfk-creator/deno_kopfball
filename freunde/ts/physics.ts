@@ -60,7 +60,7 @@ function handleItemLoading(playersArr: Player[]) {
 function setItem(loadedItem: number, playerArr: Player[]) {
   if (loadedItem === 0) {
     for (let i = 0; i < playerArr.length; i++) {
-      playerArr[i].jumpSpeed -= 2;
+      playerArr[i].jumpSpeed -= 1;
     }
   }
   if (loadedItem === 1) {
