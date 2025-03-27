@@ -4,6 +4,7 @@ import { game, props } from "./types";
 import { keyInput } from "./keyInput";
 import { drawLevel } from "./drawLevel";
 import { drawShop } from "./drawShop";
+import { connectionInitialized } from "./client";
 
 export function startGame() {
   new p5(sketch);
@@ -29,7 +30,7 @@ const sketch = (p5: p5) => {
   };
 
   p5.draw = () => {
-    if (players.length > 0 && player && socket) {
+    if (players.length > 0 && connectionInitialized) {
       keyInput(p5, socket);
       switch (game.level) {
         case 1:

@@ -3,6 +3,7 @@ import { Ball, game, GameState, levelWins, Player, props } from "./types";
 import { sprites } from "./game";
 import { clientData } from "./kopfball";
 import { getNextPlayerId, getPlayerId, runPhysics } from "./physics";
+import { connectionInitialized } from "./client";
 
 export function drawLevel(p5: p5, players: Player[]) {
   const serverGameState: GameState = {
@@ -13,12 +14,14 @@ export function drawLevel(p5: p5, players: Player[]) {
     levelWins: levelWins,
   };
 
-  runPhysics(serverGameState);
-  drawBackground(p5);
-  drawBall(p5, ball, game.nextPlayer);
-  drawPlayers(p5, players);
-  // drawNextPlayerCircle(p5, game.nextPlayer);
-  drawUi(p5);
+  if (serverGameState.ball) {
+    runPhysics(serverGameState);
+    drawBackground(p5);
+    drawBall(p5, ball, game.nextPlayer);
+    drawPlayers(p5, players);
+    // drawNextPlayerCircle(p5, game.nextPlayer);
+    drawUi(p5);
+  }
 }
 
 function drawBackground(p5: p5) {
@@ -26,8 +29,6 @@ function drawBackground(p5: p5) {
 }
 
 function drawBall(p5: p5, ball: Ball, nextPlayerId: number) {
-  console.log("key:", key);
-  console.log(nextPlayerId);
   // if c(!players[nextPlayerId])
   //   nextPlayerId = getNextPlayerId(players, nextPlayerId);
   const playerId: number = getPlayerId(players, nextPlayerId);

@@ -3,8 +3,8 @@ import { game } from "./types";
 
 let socketI: WebSocket;
 let id = -1;
-let maxConnection = 5;
-let connectionInitialized = false;
+let maxConnection = 500;
+export let connectionInitialized = false;
 
 export function connectWebSocket() {
   htmlObjects.info.innerHTML += `</br>trying to connect to: ${server_addr}</br>`;
