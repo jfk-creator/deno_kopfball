@@ -1,5 +1,6 @@
 export const port = 42069;
-export const host = "85.215.131.226";
+// export const host = "85.215.131.226"; // IONOS
+export const host = "127.0.0.1"; // HOME
 
 export const game: Game = {
   tick: 0,
@@ -29,6 +30,7 @@ export const ball: Ball = {
   gravity: 0.05,
   airDrag: 0.995,
   ballR: 40,
+  ballSpeed: 0,
 };
 
 export const ballArr: Ball[] = [
@@ -221,6 +223,7 @@ export interface Ball {
   gravity: number;
   airDrag: number;
   ballR: number;
+  ballSpeed: number;
 }
 
 export interface Player {

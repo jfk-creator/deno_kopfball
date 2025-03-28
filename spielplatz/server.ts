@@ -85,7 +85,7 @@ function handleSocket(socket: WebSocket) {
     if (debug) console.log("Received message: ", paket);
     if (paket.type === "changeName") {
       console.log(
-        `%c${serverGameState.players[playerId].name} changed his name to: ${paket.name}`,
+        `%c${serverGameState.players[playerId].name} changed her/his name to: ${paket.name}`,
         "color: orange; font-weight: bold;"
       );
       serverGameState.players[playerId].name = paket.name;
@@ -104,9 +104,6 @@ function handleSocket(socket: WebSocket) {
       serverGameState.players[playerId].velX =
         serverGameState.players[playerId].dashSpeed;
     if (paket.type == "jump") {
-      console.log(
-        performance.now() - serverGameState.players[playerId].jumpCooldown
-      );
       if (
         performance.now() - serverGameState.players[playerId].jumpCooldown >
           500 &&

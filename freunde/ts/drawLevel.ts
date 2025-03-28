@@ -112,6 +112,7 @@ function drawUi(p5: p5) {
     p5.text("Y: " + ball.posY, 12, offset * 3 + smallLineBreak * 12);
     p5.text("velX: " + ball.velX, 12, offset * 3 + smallLineBreak * 13);
     p5.text("velY: " + ball.velY, 12, offset * 3 + smallLineBreak * 14);
+    p5.text("speed: " + ball.ballSpeed, 12, offset * 3 + smallLineBreak * 15);
   }
 
   p5.textSize(20);

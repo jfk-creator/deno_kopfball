@@ -94,7 +94,9 @@ function playerPhysics(playerInst: Player): Player {
   return playerInst;
 }
 
+let lastBall: Ball;
 function ballPhysics(ballInst: Ball): Ball {
+  lastBall = JSON.parse(JSON.stringify(ballInst));
   ballInst = moveBall(ballInst);
   ballInst = addBallResistance(ballInst);
   ballInst = addBallGravity(ballInst);
@@ -103,6 +105,11 @@ function ballPhysics(ballInst: Ball): Ball {
   ballInst.posY = cutDecimal(ballInst.posY, 3);
   ballInst.velX = cutDecimal(ballInst.velX, 3);
   ballInst.velY = cutDecimal(ballInst.velY, 3);
+  ballInst.ballSpeed = Math.pow(
+    (lastBall.posX - ballInst.posX) * (lastBall.posX - ballInst.posX) +
+      (lastBall.posY - ballInst.posY) * (lastBall.posY - ballInst.posY),
+    0.5
+  );
   return ballInst;
 }
 
