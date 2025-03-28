@@ -1,3 +1,6 @@
+export const port = 42069;
+export const host = "85.215.131.226";
+
 export const game: Game = {
   tick: 0,
   ids: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],

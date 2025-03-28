@@ -1,6 +1,6 @@
 import { connectWebSocket } from "./client.ts";
 import { startGame } from "./game.ts";
-import { ballArr, hans, laura } from "./types.ts";
+import { ballArr, hans, host, laura, port } from "./types.ts";
 interface HTMLObjects {
   info: HTMLElement;
   nameVal: HTMLInputElement;
@@ -41,7 +41,7 @@ export const clientData: ClientData = {
 function init() {
   const playerName = localStorage.getItem("playName");
   const highscore = localStorage.getItem("highscore");
-  globalThis.server_addr = "ws://85.215.131.226:42069";
+  globalThis.server_addr = `ws://${host}:${port}`;
   globalThis.players = [hans, laura];
   globalThis.player = hans;
   globalThis.ball = ballArr[0];

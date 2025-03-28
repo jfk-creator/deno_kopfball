@@ -8,6 +8,7 @@ import {
   Props,
   Game,
   resetBall,
+  port,
 } from "../freunde/ts/types.ts";
 import { getPlayerFromArr } from "./src/freunde.ts";
 import {
@@ -40,7 +41,7 @@ const serverGameState = {
   levelWins: levelWins,
 };
 
-Deno.serve({ port: 42069 }, (request) => {
+Deno.serve({ port: port }, (request) => {
   if (request.headers.get("upgrade") !== "websocket") {
     return new Response(null, { status: 501 });
   }
