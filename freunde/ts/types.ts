@@ -1,6 +1,6 @@
 export const port = 42069;
-// export const host = "85.215.131.226"; // IONOS
-export const host = "127.0.0.1"; // HOME
+export const host = "85.215.131.226"; // IONOS
+// export const host = "127.0.0.1"; // HOME
 
 export const game: Game = {
   tick: 0,
