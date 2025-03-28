@@ -21,7 +21,7 @@ import {
 
 import { runPhysics } from "../freunde/ts/physics.ts";
 
-const debug = true;
+const debug = false;
 const sockets = new Map<number, WebSocket>();
 const maxConnection = 5;
 
