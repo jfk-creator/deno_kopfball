@@ -9,7 +9,9 @@ export const game: Game = {
   drawLevel: true,
   playerCount: 1,
   highscore: 0,
+  bestHit: 0,
   score: 0,
+  scoreCounter: 0,
   hits: 0,
   nextPlayer: 0,
   itemLoadingBar: [0, 0, 0],
@@ -202,7 +204,9 @@ export interface Game {
   drawLevel: boolean;
   playerCount: number;
   highscore: number;
+  bestHit: number;
   score: number;
+  scoreCounter: number;
   hits: number;
   nextPlayer: number;
   itemLoadingBar: number[];

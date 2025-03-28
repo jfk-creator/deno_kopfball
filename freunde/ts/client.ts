@@ -1,4 +1,5 @@
 import { htmlObjects } from "./kopfball";
+import { getPlayerId } from "./physics";
 import { game } from "./types";
 
 let socketI: WebSocket;
@@ -47,6 +48,7 @@ function handleConnection(socket: WebSocket) {
     }
     if (connectionInitialized) {
       if (paket.type == "gameState") {
+        player = paket.players[getPlayerId(paket.players, key)];
         players = paket.players;
         ball = paket.ball;
         game.nextPlayer = paket.nextPlayer;

@@ -16,6 +16,7 @@ export function runPhysics(gameState: GameState): GameState {
 
   if (gameState.game.drawLevel) {
     // levelTime
+    countScoreCounter();
     gameState.ball = ballPhysics(gameState.ball);
     for (let i = 0; i < gameState.players.length; i++) {
       gameState.ball = kopfball(
@@ -34,6 +35,12 @@ export function runPhysics(gameState: GameState): GameState {
   return gameState;
 }
 let positionChanged = 0;
+
+function countScoreCounter() {
+  if (game.score - game.scoreCounter > 1000) game.scoreCounter += 1000;
+  if (game.score - game.scoreCounter > 100) game.scoreCounter += 100;
+  if (game.score - game.scoreCounter > 0) game.scoreCounter += 1;
+}
 
 function handleItemLoading(playersArr: Player[]) {
   let loadedItem = 0;
@@ -94,17 +101,22 @@ function playerPhysics(playerInst: Player): Player {
   return playerInst;
 }
 
-let lastBall: Ball;
 function ballPhysics(ballInst: Ball): Ball {
   lastBall = JSON.parse(JSON.stringify(ballInst));
   ballInst = moveBall(ballInst);
   ballInst = addBallResistance(ballInst);
   ballInst = addBallGravity(ballInst);
   ballInst = ballBoundingBoxes(ballInst);
+  ballInst = getBallSpeed(ballInst);
   ballInst.posX = cutDecimal(ballInst.posX, 3);
   ballInst.posY = cutDecimal(ballInst.posY, 3);
   ballInst.velX = cutDecimal(ballInst.velX, 3);
   ballInst.velY = cutDecimal(ballInst.velY, 3);
+  ballInst.ballSpeed = cutDecimal(ballInst.ballSpeed, 3);
+  return ballInst;
+}
+export let lastBall: Ball;
+function getBallSpeed(ballInst: Ball): Ball {
   ballInst.ballSpeed = Math.pow(
     (lastBall.posX - ballInst.posX) * (lastBall.posX - ballInst.posX) +
       (lastBall.posY - ballInst.posY) * (lastBall.posY - ballInst.posY),
@@ -164,11 +176,12 @@ function ballBoundingBoxes(ballInst: Ball): Ball {
     ballInst.velY *= -0.999;
     game.hits = 0;
     game.score = 0;
+    game.scoreCounter = 0;
   }
   return ballInst;
 }
 
-function kopfball(
+function kopfball_old(
   playerInst: Player,
   ballInst: Ball,
   playerArr: Player[]
@@ -206,6 +219,93 @@ function kopfball(
     } else {
       game.hits = 0;
       game.score = 0;
+    }
+
+    ballInst.velY += -playerInst.velY * playerInst.hitForce;
+    ballInst.velY *= -1;
+    ballInst.velX +=
+      ((ballInst.posX - playerInst.posX - playerInst.playerWidth / 2) / 25) * 4;
+    return ballInst;
+  }
+  return ballInst;
+}
+
+// line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
+// Determine the intersection point of two line segments
+// Return FALSE if the lines don't intersect
+function intersect(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  x3: number,
+  y3: number,
+  x4: number,
+  y4: number
+) {
+  // Check if none of the lines are of length 0
+  if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
+    return false;
+  }
+
+  let denominator = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+
+  // Lines are parallel
+  if (denominator === 0) {
+    return false;
+  }
+
+  let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
+  let ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+
+  // is the intersection along the segments
+  if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+    return false;
+  }
+
+  // Return a object with the x and y coordinates of the intersection
+  let x = x1 + ua * (x2 - x1);
+  let y = y1 + ua * (y2 - y1);
+
+  return { x, y };
+}
+
+function kopfball(
+  playerInst: Player,
+  ballInst: Ball,
+  playerArr: Player[]
+): Ball {
+  if (
+    intersect(
+      lastBall.posX,
+      lastBall.posY - ballInst.ballR / 2,
+      ballInst.posX,
+      ballInst.posY + ballInst.ballR / 2,
+      playerInst.posX,
+      playerInst.posY - playerInst.playerHeight - playerInst.playerOffset,
+      playerInst.posX + playerInst.playerWidth,
+      playerInst.posY - playerInst.playerHeight - playerInst.playerOffset
+    ) &&
+    ballInst.velY > 0
+  ) {
+    if (playerInst.id == game.nextPlayer) {
+      game.hits++;
+      let scoreHit = Math.floor(ballInst.ballSpeed * Math.pow(10, 3));
+      game.score += scoreHit;
+      if (scoreHit > game.bestHit) game.bestHit = scoreHit;
+      if (game.score > game.highscore) game.highscore = game.score;
+      if (game.score > levelWins[(game.level - 1) % levelWins.length]) {
+        game.drawLevel = false;
+        game.score = 0;
+        game.scoreCounter = 0;
+        setItemLoadingBarZero();
+      }
+
+      game.nextPlayer = getNextPlayerId(playerArr, game.nextPlayer);
+    } else {
+      game.hits = 0;
+      game.score = 0;
+      game.scoreCounter = 0;
     }
 
     ballInst.velY += -playerInst.velY * playerInst.hitForce;

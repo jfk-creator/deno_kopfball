@@ -2,8 +2,7 @@ import p5 from "p5";
 import { Ball, game, GameState, levelWins, Player, props } from "./types";
 import { sprites } from "./game";
 import { clientData } from "./kopfball";
-import { getNextPlayerId, getPlayerId, runPhysics } from "./physics";
-import { connectionInitialized } from "./client";
+import { getNextPlayerId, getPlayerId, lastBall, runPhysics } from "./physics";
 
 export function drawLevel(p5: p5, players: Player[]) {
   const serverGameState: GameState = {
@@ -21,6 +20,7 @@ export function drawLevel(p5: p5, players: Player[]) {
     drawPlayers(p5, players);
     // drawNextPlayerCircle(p5, game.nextPlayer);
     drawUi(p5);
+    drawHitBox(p5, serverGameState);
   }
 }
 
@@ -114,9 +114,41 @@ function drawUi(p5: p5) {
     p5.text("velY: " + ball.velY, 12, offset * 3 + smallLineBreak * 14);
     p5.text("speed: " + ball.ballSpeed, 12, offset * 3 + smallLineBreak * 15);
   }
+  p5.textSize(64);
+  p5.textAlign(p5.CENTER);
+  let scoreDiff = game.scoreCounter / levelWins[game.level - 1];
+  if (scoreDiff < 0.25) p5.fill("#E5F0F4");
+  if (scoreDiff > 0.25) p5.fill("#c99716");
+  if (scoreDiff > 0.4) p5.fill("#d68411");
+  if (scoreDiff > 0.6) p5.fill("#e0600b");
+  if (scoreDiff > 0.8) p5.fill("#f04c1a");
+  if (scoreDiff > 0.9) p5.fill("#fc1408");
 
+  p5.text(game.scoreCounter, props.width / 2, offset + lineBreak * 1.5);
+  // right side:
+  p5.fill("#E5F0F4");
   p5.textSize(20);
   p5.textAlign(p5.RIGHT);
   p5.text("Highscore: " + game.highscore, props.width - 12, offset);
-  p5.text("Score: " + game.score, props.width - 12, offset + lineBreak);
+  p5.text("BestHit: " + game.bestHit, props.width - 12, offset + lineBreak);
+}
+
+function drawHitBox(p5: p5, serverGameState: GameState) {
+  if (debug) {
+    p5.stroke(255);
+    p5.strokeWeight(5);
+    p5.line(
+      lastBall.posX,
+      lastBall.posY,
+      serverGameState.ball.posX,
+      serverGameState.ball.posY
+    );
+    p5.line(
+      player.posX,
+      player.posY - player.playerHeight - player.playerOffset,
+      player.posX + player.playerWidth,
+      player.posY - player.playerHeight - player.playerOffset
+    );
+    p5.noStroke();
+  }
 }
