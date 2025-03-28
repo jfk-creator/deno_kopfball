@@ -58,6 +58,8 @@ function handleItemLoading(playersArr: Player[]) {
           setItem(loadedItem, playersArr);
           game.drawLevel = true;
           game.level++;
+          game.score = 0;
+          game.scoreCounter = 0;
         }
       }
     }
