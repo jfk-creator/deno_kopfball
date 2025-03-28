@@ -191,9 +191,7 @@ function kopfball(
   ) {
     if (playerInst.id == game.nextPlayer) {
       game.hits++;
-      game.score += Math.floor(
-        (ballInst.velX + ballInst.velY) * Math.pow(10, 3)
-      );
+      game.score += Math.floor(ballInst.ballSpeed * Math.pow(10, 3));
       if (game.score > game.highscore) {
         game.highscore = game.score;
         localStorage.setItem("highscore", JSON.stringify(game.highscore));
