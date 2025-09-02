@@ -1,5 +1,5 @@
 let socket;
-let server_addr = "ws://127.0.0.1:420";
+let server_addr = "ws://server.nanohack.de";
 let info = document.getElementById("info");
 let nameVal = document.getElementById("name");
 let sendNameButton = document.getElementById("sendName");

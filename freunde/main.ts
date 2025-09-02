@@ -4,7 +4,7 @@ import { gameState as gs, resetBall, runPhysics } from "./gameState.ts";
 // #region client
 
 let socket: WebSocket;
-let server_addr = "ws://192.168.178.22:420";
+let server_addr = "ws://server.nanohack.de";
 let info = document.getElementById("info");
 let nameVal = document.getElementById("name") as HTMLInputElement;
 let sendNameButton = document.getElementById("sendName");

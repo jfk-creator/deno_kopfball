@@ -227,7 +227,7 @@ function broadcast() {
   for (const [id, socket] of sockets.entries()) {
     if (socket.readyState === WebSocket.OPEN) {
       const paket = {
-        type: "players",
+        type: "gameState",
         id: id,
         players: serverGameState.player,
         ball: serverGameState.ball,

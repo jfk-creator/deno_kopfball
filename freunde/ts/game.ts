@@ -30,8 +30,8 @@ const sketch = (p5: p5) => {
   };
 
   p5.draw = () => {
-    if (players.length > 0 && connectionInitialized) {
-      keyInput(p5, socket);
+     if (players.length > 0 && connectionInitialized) {
+	     keyInput(p5, socket);
       switch (game.level) {
         case 1:
           if (game.drawLevel) drawLevel(p5, players);

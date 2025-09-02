@@ -2,7 +2,7 @@ import { htmlObjects } from "./kopfball";
 import { getPlayerId } from "./physics";
 import { game } from "./types";
 
-let socketI: WebSocket;
+export let socketI: WebSocket;
 let id = -1;
 let maxConnection = 500;
 export let connectionInitialized = false;
@@ -18,8 +18,9 @@ export function connectWebSocket() {
   handleConnection(socket);
 }
 
-function handleConnection(socket: WebSocket) {
+export function handleConnection(socket: WebSocket) {
   socket.addEventListener("message", (event) => {
+    console.log("paket arrived");
     let paket = JSON.parse(event.data);
     if (paket.type == "init" && !connectionInitialized) {
       globalThis.key = paket.key;
@@ -55,7 +56,7 @@ function handleConnection(socket: WebSocket) {
         game.score = paket.score;
         game.level = paket.level;
         game.drawLevel = paket.drawLevel;
-        game.itemLoadingBar = paket.itemLoadingBar;
+        //game.itemLoadingBar = paket.itemLoadingBar;
       }
       if (paket.type == "ping") {
         if (!paket.pong) {
