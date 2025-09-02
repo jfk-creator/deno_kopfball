@@ -32,7 +32,8 @@ function drawBall(p5: p5, ball: Ball, nextPlayerId: number) {
   // if c(!players[nextPlayerId])
   //   nextPlayerId = getNextPlayerId(players, nextPlayerId);
   const playerId: number = getPlayerId(players, nextPlayerId);
-  p5.fill(players[playerId].color);
+  
+  if(players[playerId]) p5.fill(players[playerId].color);
   p5.circle(ball.posX, ball.posY, ball.ballR);
 }
 
